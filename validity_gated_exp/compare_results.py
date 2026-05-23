@@ -29,6 +29,8 @@ PRIMARY_METRICS = [
     ("strict_prob_gap", "S-ProbGap", "lower"),
     ("fpr_gap", "FPRGap", "lower"),
     ("train_valid_cf_ratio", "TrainCF%", "higher"),
+    ("cons_batch_ratio", "ConsBatch%", "higher"),
+    ("avg_valid_cf_per_batch", "ValidCF/B", "higher"),
 ]
 
 
@@ -79,7 +81,7 @@ def print_table(results: dict[str, dict[str, Any]]) -> None:
     for name, metrics in results.items():
         row = [name.ljust(name_w)]
         for key, _, _ in PRIMARY_METRICS:
-            scale = 100.0 if key == "train_valid_cf_ratio" else 1.0
+            scale = 100.0 if key in ("train_valid_cf_ratio", "cons_batch_ratio") else 1.0
             row.append(fmt(metrics.get(key), scale=scale).rjust(13))
         print("  ".join(row))
 
@@ -120,6 +122,10 @@ def print_interpretation_notes(results: dict[str, dict[str, Any]]) -> None:
         strict_gap = mean_or_none(strict.get("strict_prob_gap"))
         naive_cf = mean_or_none(naive.get("train_valid_cf_ratio"))
         strict_cf = mean_or_none(strict.get("train_valid_cf_ratio"))
+        naive_cb = mean_or_none(naive.get("cons_batch_ratio"))
+        strict_cb = mean_or_none(strict.get("cons_batch_ratio"))
+        naive_vb = mean_or_none(naive.get("avg_valid_cf_per_batch"))
+        strict_vb = mean_or_none(strict.get("avg_valid_cf_per_batch"))
         if naive_sp is not None and strict_sp is not None:
             if strict_sp >= naive_sp:
                 print("- Strict-Gated beats or matches Naive on Strict PairAcc: this supports the validity-gated claim.")
@@ -145,6 +151,10 @@ def print_interpretation_notes(results: dict[str, dict[str, Any]]) -> None:
                 print("Use a cautious claim: identity-swap CCR helps, but gate benefits depend on metric choice.")
             if naive_cf is not None and strict_cf is not None:
                 print(f"TrainCF coverage: Naive={100*naive_cf:.2f}% vs Strict={100*strict_cf:.2f}%.")
+            if naive_cb is not None and strict_cb is not None:
+                print(f"Regularized batches: Naive={100*naive_cb:.2f}% vs Strict={100*strict_cb:.2f}%.")
+            if naive_vb is not None and strict_vb is not None:
+                print(f"Valid CF per batch: Naive={naive_vb:.2f} vs Strict={strict_vb:.2f}.")
         else:
             print("- Strict/Naive PairAcc is missing for at least one method; rerun both with the same current code.")
 
@@ -152,14 +162,15 @@ def print_interpretation_notes(results: dict[str, dict[str, Any]]) -> None:
 def print_markdown_table(results: dict[str, dict[str, Any]]) -> None:
     print("\nMarkdown table")
     print("--------------")
-    print("| Method | Macro-F1 | Pair Acc | Strict Pair Acc | Flip Rate | Strict Flip | Prob Gap | Strict Prob Gap | Train CF% |")
-    print("| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |")
+    print("| Method | Macro-F1 | Pair Acc | Strict Pair Acc | Flip Rate | Strict Flip | Prob Gap | Strict Prob Gap | Train CF% | Cons Batch% |")
+    print("| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |")
     for name, metrics in results.items():
         print(
             f"| {name} | {fmt(metrics.get('f1'))} | {fmt(metrics.get('pair_accuracy'))} | "
             f"{fmt(metrics.get('strict_pair_accuracy'))} | {fmt(metrics.get('flip_rate'))} | "
             f"{fmt(metrics.get('strict_flip_rate'))} | {fmt(metrics.get('prob_gap'))} | "
-            f"{fmt(metrics.get('strict_prob_gap'))} | {fmt(metrics.get('train_valid_cf_ratio'), scale=100.0)} |"
+            f"{fmt(metrics.get('strict_prob_gap'))} | {fmt(metrics.get('train_valid_cf_ratio'), scale=100.0)} | "
+            f"{fmt(metrics.get('cons_batch_ratio'), scale=100.0)} |"
         )
 
 

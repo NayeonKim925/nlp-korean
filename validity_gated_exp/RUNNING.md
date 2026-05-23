@@ -197,6 +197,7 @@ python validity_gated_exp/compare_results.py \
 ```
 
 이 스크립트는 콘솔용 비교표, Baseline 대비 delta, paper claim suggestion, Markdown 표를 같이 출력합니다. 보고서 표 초안은 `Markdown table` 섹션을 가져가면 됩니다.
+`TrainCF%`, `ConsBatch%`, `ValidCF/B`는 Strict가 Naive보다 약하게 나왔을 때 regularization signal coverage 차이를 설명하는 데 씁니다.
 
 ## 7. Hardware Notes
 

@@ -48,6 +48,7 @@
 6. Naive Swap이 Strict-Gated보다 잘 나올 수 있다.
 
    이 경우 프로젝트가 실패한 것이 아니다. Naive가 더 많은 CF pair를 학습하기 때문에 stronger regularization을 받는다는 해석이 가능하다. 새 코드에서는 `train_valid_cf_ratio`, `pair_count`, `strict_pair_count`를 저장하므로, Strict가 지면 "gate가 너무 보수적이어서 useful signal을 줄인다"는 분석으로 전환한다.
+   추가로 `cons_batch_ratio`와 `avg_valid_cf_per_batch`를 확인해 Strict가 실제로 더 적은 batch/CF에서만 consistency loss를 받았는지 검증한다.
 
 ## Minimum Experiment Set
 

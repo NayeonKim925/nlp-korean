@@ -113,11 +113,15 @@ def sym_kl(p: torch.Tensor, q: torch.Tensor) -> torch.Tensor:
 def train_epoch(model, loader, optimizer, scheduler, scaler, use_cons: bool, lam: float):
     model.train()
     s_total = s_cls = s_cons = 0.0
+    cons_batches = 0
+    valid_cf_total = 0
     for batch in tqdm(loader, desc='  train', leave=False):
         ids  = batch['input_ids'].to(device)
         mask = batch['attention_mask'].to(device)
         y    = batch['label'].to(device)
         valid = batch['cf_valid'].to(device)
+        valid_count = int(valid.sum().item())
+        valid_cf_total += valid_count
 
         optimizer.zero_grad()
         with amp_context():
@@ -126,7 +130,8 @@ def train_epoch(model, loader, optimizer, scheduler, scaler, use_cons: bool, lam
             loss     = cls_loss
             c_val    = torch.tensor(0.0, device=device)
 
-            if use_cons and 'cf_input_ids' in batch and valid.any():
+            if use_cons and 'cf_input_ids' in batch and valid_count > 0:
+                cons_batches += 1
                 cf_ids  = batch['cf_input_ids'].to(device)
                 cf_mask = batch['cf_attention_mask'].to(device)
                 p_o = model.probs(ids[valid],   mask[valid])
@@ -143,7 +148,13 @@ def train_epoch(model, loader, optimizer, scheduler, scaler, use_cons: bool, lam
         s_total += loss.item(); s_cls += cls_loss.item(); s_cons += c_val.item()
 
     n = len(loader)
-    return s_total / n, s_cls / n, s_cons / n
+    return (
+        s_total / n,
+        s_cls / n,
+        s_cons / n,
+        cons_batches / n if n else 0.0,
+        valid_cf_total / n if n else 0.0,
+    )
 
 
 def eval_f1(model, loader) -> float:
@@ -290,6 +301,7 @@ def run_experiment(tag: str, mode: str, use_cons: bool, lam: float = LAMBDA,
         'strict_flip_rate': [], 'strict_prob_gap': [], 'strict_pair_accuracy': [],
         'pair_count': [], 'strict_pair_count': [],
         'train_valid_cf_count': [], 'train_valid_cf_ratio': [],
+        'cons_batch_ratio': [], 'avg_valid_cf_per_batch': [],
         'fpr_gap': [],
         'epoch_history': [],   # [{seed, epochs: [{ep, val_f1, total_loss, cls_loss, cons_loss}]}]
     }
@@ -332,12 +344,18 @@ def run_experiment(tag: str, mode: str, use_cons: bool, lam: float = LAMBDA,
         best_state = {k: v.cpu().clone() for k, v in model.state_dict().items()}
         seed_epochs = []
         for ep in range(1, n_epochs + 1):
-            tl, cl, cons = train_epoch(model, tr_dl, opt, scheduler, scaler, use_cons, lam)
+            tl, cl, cons, cons_batch_ratio, avg_valid_cf = train_epoch(
+                model, tr_dl, opt, scheduler, scaler, use_cons, lam
+            )
             vf1 = eval_f1(model, va_dl)
-            print(f'  ep{ep}: total={tl:.4f} cls={cl:.4f} cons={cons:.4f} | val_F1={vf1:.4f}')
+            print(f'  ep{ep}: total={tl:.4f} cls={cl:.4f} cons={cons:.4f} '
+                  f'cons_batches={100*cons_batch_ratio:.1f}% valid_cf/batch={avg_valid_cf:.2f} '
+                  f'| val_F1={vf1:.4f}')
             seed_epochs.append({
                 'ep': ep, 'val_f1': round(vf1, 6),
                 'total_loss': round(tl, 6), 'cls_loss': round(cl, 6), 'cons_loss': round(cons, 6),
+                'cons_batch_ratio': round(cons_batch_ratio, 6),
+                'avg_valid_cf_per_batch': round(avg_valid_cf, 6),
             })
             if vf1 > best_f1:
                 best_f1 = vf1
@@ -376,6 +394,9 @@ def run_experiment(tag: str, mode: str, use_cons: bool, lam: float = LAMBDA,
         metrics['strict_pair_count'].append(strict_pair_count)
         metrics['train_valid_cf_count'].append(train_valid_cf_count)
         metrics['train_valid_cf_ratio'].append(train_valid_cf_ratio)
+        if seed_epochs:
+            metrics['cons_batch_ratio'].append(float(np.mean([e['cons_batch_ratio'] for e in seed_epochs])))
+            metrics['avg_valid_cf_per_batch'].append(float(np.mean([e['avg_valid_cf_per_batch'] for e in seed_epochs])))
         metrics['fpr_gap'].append(fpr_gap)
         metrics['epoch_history'].append({'seed': seed, 'epochs': seed_epochs})
 
@@ -392,6 +413,8 @@ def run_experiment(tag: str, mode: str, use_cons: bool, lam: float = LAMBDA,
     print(f'  Strict Prob Gap ↓  : {_s(metrics["strict_prob_gap"])}')
     print(f'  Strict Pair Acc ↑  : {_s(metrics["strict_pair_accuracy"])}')
     print(f'  Train valid CF     : {_s(metrics["train_valid_cf_ratio"])}')
+    print(f'  Cons batch ratio   : {_s(metrics["cons_batch_ratio"])}')
+    print(f'  Valid CF / batch   : {_s(metrics["avg_valid_cf_per_batch"])}')
     print(f'  Eval pair counts   : all={_s(metrics["pair_count"])}  strict={_s(metrics["strict_pair_count"])}')
     print(f'  FPR Gap ↓          : {_s(metrics["fpr_gap"])}')
     print(f'{"="*60}')
@@ -587,6 +610,8 @@ if __name__ == '__main__':
             'strict_pair_count_mean': _m(metrics.get('strict_pair_count', [])),
             'train_valid_cf_count_mean': _m(metrics.get('train_valid_cf_count', [])),
             'train_valid_cf_ratio_mean': _m(metrics.get('train_valid_cf_ratio', [])),
+            'cons_batch_ratio_mean': _m(metrics.get('cons_batch_ratio', [])),
+            'avg_valid_cf_per_batch_mean': _m(metrics.get('avg_valid_cf_per_batch', [])),
             'fpr_gap_mean': _m(metrics['fpr_gap']), 'fpr_gap_std': _s(metrics['fpr_gap']),
         })
     if rows:
