@@ -54,6 +54,14 @@ MAX_MATCHED_LAMBDA = 0.3
 SEEDS       = [42, 123, 456]
 SUBSET      = 0      # 0 = full 172K
 NUM_WORKERS = 4
+AVAILABLE_EXPERIMENT_TAGS = (
+    'Baseline',
+    'Masking Cons Reg',
+    'Naive Swap',
+    'Validity-Gated',
+    'Strict-Gated',
+    'Strict-Matched',
+)
 
 BASE_DIR = os.environ.get('EXP_DIR', BASE_DIR)
 
@@ -516,6 +524,16 @@ if __name__ == '__main__':
                         help='directory for data/checkpoints/results; default is script directory')
     parser.add_argument('--result_path', default=None)
     args = parser.parse_args()
+    known_tags = set(AVAILABLE_EXPERIMENT_TAGS)
+    unknown_tags = unknown_experiment_tags(args.exp, known_tags)
+    if unknown_tags:
+        valid = sorted(known_tags) + ['Strict_lam=<positive_float>']
+        raise SystemExit(
+            f"Unknown --exp tag(s): {unknown_tags}. "
+            f"Valid choices: {valid}"
+        )
+    lam_targets = parse_strict_lambda_tags(args.exp)
+
     if args.model:
         MODEL_NAME = args.model
     if args.batch_size:
@@ -655,15 +673,6 @@ if __name__ == '__main__':
 
     # --exp 인자로 특정 실험만 선택
     run_ablations = ABLATIONS
-    known_tags = {e['tag'] for e in ABLATIONS}
-    unknown_tags = unknown_experiment_tags(args.exp, known_tags)
-    if unknown_tags:
-        valid = sorted(known_tags) + ['Strict_lam=<positive_float>']
-        raise SystemExit(
-            f"Unknown --exp tag(s): {unknown_tags}. "
-            f"Valid choices: {valid}"
-        )
-    lam_targets = parse_strict_lambda_tags(args.exp)
     if args.exp:
         run_ablations = [e for e in ABLATIONS if e['tag'] in args.exp]
         if not run_ablations and not lam_targets:
