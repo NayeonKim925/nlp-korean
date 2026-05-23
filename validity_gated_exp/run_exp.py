@@ -134,7 +134,10 @@ def train_epoch(model, loader, optimizer, scheduler, scaler, use_cons: bool, lam
                 cons_batches += 1
                 cf_ids  = batch['cf_input_ids'].to(device)
                 cf_mask = batch['cf_attention_mask'].to(device)
-                p_o = model.probs(ids[valid],   mask[valid])
+                # Reuse the already-computed original logits as the consistency
+                # anchor. Re-forwarding originals in train mode injects extra
+                # dropout noise and makes the KL signal less stable.
+                p_o = F.softmax(logits[valid], dim=-1)
                 p_c = model.probs(cf_ids[valid], cf_mask[valid])
                 c_val = sym_kl(p_o, p_c)
                 loss  = loss + lam * c_val

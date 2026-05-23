@@ -21,6 +21,8 @@
 - Strict-Gated: 비교 구문, 사건 목적어, age contradiction까지 제한한 conservative gate
 - Masking Cons Reg: identity masking과 비교하는 sanity baseline
 
+Implementation note: consistency KL은 원문을 다시 forward하지 않고 classification loss에서 이미 계산한 original logits를 anchor로 재사용한다. 이렇게 해야 train-time dropout이 원문 쪽에 한 번 더 들어가면서 KL signal이 불필요하게 noisy해지는 것을 줄일 수 있다.
+
 따라서 보고서에서는 "새 평가셋 만들기"보다 "counterfactual regularization에서 invariance strength와 validity filtering의 trade-off를 분석하는 방법"으로 쓰는 편이 좋다.
 
 ## Critical Risks
