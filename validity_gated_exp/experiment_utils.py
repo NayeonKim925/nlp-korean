@@ -3,6 +3,18 @@
 from __future__ import annotations
 
 
+ERROR_EXAMPLE_BUCKETS = (
+    "flip",
+    "strict_flip",
+    "both_wrong",
+    "strict_both_wrong",
+    "orig_wrong_cf_right",
+    "orig_right_cf_wrong",
+    "false_positive_original",
+    "false_positive_cf",
+)
+
+
 def coverage_matched_lambda(
     base_lambda: float,
     reference_valid_count: int,
@@ -121,3 +133,74 @@ def unknown_experiment_tags(exp_tags: list[str] | None, known_tags: set[str]) ->
         tag for tag in exp_tags
         if tag not in known_tags and not tag.startswith("Strict_lam=")
     ]
+
+
+def _round_float(value, digits: int):
+    if value is None:
+        return None
+    return round(float(value), digits)
+
+
+def collect_fairness_error_examples(
+    pair_records: list[dict],
+    limit_per_bucket: int = 5,
+    digits: int = 4,
+) -> dict[str, list[dict]]:
+    """Collect capped, report-friendly examples explaining fairness metrics.
+
+    Pair-level metrics are useful but easy to misread: a low flip rate can still
+    hide pairs where both sides are consistently wrong. These buckets preserve a
+    few concrete examples per seed so the final report can discuss whether a
+    method improved robustness or simply became consistently over/under-sensitive.
+    """
+    buckets = {bucket: [] for bucket in ERROR_EXAMPLE_BUCKETS}
+
+    def add(bucket: str, record: dict):
+        if len(buckets[bucket]) >= limit_per_bucket:
+            return
+        buckets[bucket].append({
+            "text": record.get("text"),
+            "cf_text": record.get("cf_text"),
+            "label": record.get("label"),
+            "pred": record.get("pred"),
+            "cf_pred": record.get("cf_pred"),
+            "prob": _round_float(record.get("prob"), digits),
+            "cf_prob": _round_float(record.get("cf_prob"), digits),
+            "prob_gap": _round_float(record.get("prob_gap"), digits),
+            "orig_term": record.get("orig_term"),
+            "swap_term": record.get("swap_term"),
+            "category": record.get("category"),
+            "strict_valid": bool(record.get("strict_valid")),
+        })
+
+    for record in pair_records:
+        if record.get("cf_pred") is None:
+            continue
+
+        label = record.get("label")
+        pred = record.get("pred")
+        cf_pred = record.get("cf_pred")
+        strict_valid = bool(record.get("strict_valid"))
+
+        orig_correct = pred == label
+        cf_correct = cf_pred == label
+
+        if pred != cf_pred:
+            add("flip", record)
+            if strict_valid:
+                add("strict_flip", record)
+        if not orig_correct and not cf_correct:
+            add("both_wrong", record)
+            if strict_valid:
+                add("strict_both_wrong", record)
+        elif not orig_correct and cf_correct:
+            add("orig_wrong_cf_right", record)
+        elif orig_correct and not cf_correct:
+            add("orig_right_cf_wrong", record)
+
+        if label == 0 and pred == 1:
+            add("false_positive_original", record)
+        if label == 0 and cf_pred == 1:
+            add("false_positive_cf", record)
+
+    return buckets

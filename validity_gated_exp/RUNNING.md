@@ -228,6 +228,8 @@ python validity_gated_exp/compare_results.py \
 `Recommended next steps`는 현재 결과 기준으로 후속 실험이 더 필요한지 알려줍니다. Naive가 gated 계열보다 강하면 `Strict-Matched`와 `Strict_lam=*` follow-up을 먼저 돌리고, gated가 충분히 강하면 method search를 멈추고 error analysis/report로 넘어갑니다.
 `Report readiness audit`에 `FAIL`이 하나라도 있으면 final report 표로 쓰기 전에 해당 조건을 다시 실행합니다. `WARN`은 보고서에서 보조 지표/한계로 명시합니다.
 
+각 experiment 결과에는 seed별 `fairness_error_examples`가 저장됩니다. 이 필드는 `flip`, `strict_flip`, `both_wrong`, `strict_both_wrong`, `orig_wrong_cf_right`, `orig_right_cf_wrong`, `false_positive_original`, `false_positive_cf` 예시를 최대 5개씩 담습니다. 낮은 flip rate가 정말 좋은 robustness인지, 아니면 원문과 CF를 둘 다 틀려서 생긴 착시인지 확인할 때 씁니다.
+
 비교 출력 맨 위의 `Result metadata`와 `Experiment configs`를 먼저 확인합니다.
 
 - `missing _meta` 또는 `missing per-experiment config`가 뜨는 old result는 final table에 섞지 않습니다.
@@ -258,3 +260,4 @@ python validity_gated_exp/compare_results.py \
 보고서의 핵심 claim은 `Macro-F1 유지 + Strict Pair Acc 개선 + invalid counterfactual filtering 근거`로 잡는 것이 가장 안전합니다.
 
 Strict-Gated가 Naive Swap보다 항상 좋아진다는 보장은 없습니다. Naive가 이기면 실패로 처리하지 말고, `TrainCF%`, `ConsBatch%`, `ValidCF/B`, strict rejection breakdown을 근거로 "strong invariance vs validity filtering" trade-off로 해석합니다.
+이때 `fairness_error_examples`에서 Naive와 Strict 계열의 `both_wrong`, `strict_flip`, `false_positive_*` 사례를 비교해, 어떤 방법이 실제 혐오/비혐오 판단을 망치는지 정성 분석을 붙입니다.

@@ -171,6 +171,11 @@ class CompareResultsTest(unittest.TestCase):
                 "prob_gap": [0.02, 0.02, 0.02],
                 "strict_prob_gap": [0.02, 0.02, 0.02],
                 "fpr_min_group_n": [30, 30, 30],
+                "fairness_error_examples": [
+                    {"seed": 42, "examples": {"flip": []}},
+                    {"seed": 123, "examples": {"flip": []}},
+                    {"seed": 456, "examples": {"flip": []}},
+                ],
                 "config": {
                     "mode": mode,
                     "git_commit": "abc123",
@@ -219,6 +224,7 @@ class CompareResultsTest(unittest.TestCase):
         self.assertIn("Missing core methods", joined)
         self.assertIn("only 1 valid F1 seed", joined)
         self.assertIn("missing report-critical metrics", joined)
+        self.assertIn("missing fairness_error_examples", joined)
         self.assertNotIn("Core methods have at least", "\n".join(passes))
 
     def test_report_readiness_audit_warns_on_checkpoint_results(self):

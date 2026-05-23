@@ -78,8 +78,7 @@ python validity_gated_exp/compare_results.py validity_gated_exp/results_core.jso
 
 ```bash
 python validity_gated_exp/run_exp.py \
-  --exp Strict-Gated \
-  --lambda 0.05 \
+  --exp Strict_lam=0.05 \
   --seeds 42 123 456 \
   --epochs 3 \
   --batch_size 64 \
@@ -88,8 +87,7 @@ python validity_gated_exp/run_exp.py \
   2>&1 | tee train_strict_lam005.log
 
 python validity_gated_exp/run_exp.py \
-  --exp Strict-Gated \
-  --lambda 0.2 \
+  --exp Strict_lam=0.2 \
   --seeds 42 123 456 \
   --epochs 3 \
   --batch_size 64 \
@@ -138,3 +136,4 @@ Construction analysis table:
 - Trade-off outcome: Naive Swap beats Strict-Gated on Strict Pair Acc or Flip Rate, while Strict-Gated has comparable F1 or lower Prob Gap. Then report an invariance-validity tradeoff.
 - Bad outcome: Naive Swap beats Strict-Gated on every metric. Then the current gate is too conservative or wrong; analyze valid pair coverage and category distribution and try `Strict-Matched` or a larger `--lambda` for Strict-Gated.
 - Do not claim fairness improvement from lower flip rate alone.
+- Use saved `fairness_error_examples` to compare `flip`, `both_wrong`, and `false_positive_*` cases before writing the qualitative analysis. If Naive has lower flip rate but more `both_wrong` examples, frame it as consistency without correctness rather than fairness improvement.

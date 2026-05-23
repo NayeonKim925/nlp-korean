@@ -34,6 +34,7 @@ from dataset import (
 )
 from experiment_utils import (
     build_result_snapshot,
+    collect_fairness_error_examples,
     coverage_matched_lambda,
     merge_result_maps,
     parse_strict_lambda_tags,
@@ -51,6 +52,7 @@ LR          = 3e-5
 WEIGHT_DECAY= 0.01
 LAMBDA      = 0.1
 MAX_MATCHED_LAMBDA = 0.3
+MAX_ERROR_EXAMPLES_PER_BUCKET = 5
 SEEDS       = [42, 123, 456]
 SUBSET      = 0      # 0 = full 172K
 NUM_WORKERS = 4
@@ -224,7 +226,8 @@ def eval_fairness(model, test_examples, tokenizer):
       strict_flip_rate, strict_prob_gap, strict_pair_accuracy,
       n_pairs, n_strict_pairs,
       fpr_gap (max FPR across target groups - min FPR),
-      per_group_fpr dict, per_group_fpr_detail dict
+      per_group_fpr dict, per_group_fpr_detail dict,
+      fairness_error_examples dict
     """
     model.eval()
 
@@ -259,16 +262,37 @@ def eval_fairness(model, test_examples, tokenizer):
         cf_probs_map = dict(zip(swap_indices, cf_probs_list))
 
     results = []
+    pair_records = []
     for i, (text, label, orig_term, swap_term, cat, cf_text) in enumerate(meta):
         prob = orig_probs[i]
         pred = int(prob >= 0.5)
         cf_prob = cf_probs_map.get(i)
         cf_pred = int(cf_prob >= 0.5) if cf_prob is not None else None
+        strict_valid = False
+        if cf_text is not None:
+            strict_valid = compute_validity_strict(
+                text, cf_text, orig_term, swap_term, cat
+            )['use_for_ccr']
         results.append({
             'label': label, 'pred': pred, 'prob': prob,
             'cf_pred': cf_pred, 'cf_prob': cf_prob,
-            'cat': cat,
+            'cat': cat, 'strict_valid': strict_valid,
         })
+        if cf_text is not None:
+            pair_records.append({
+                'text': text,
+                'cf_text': cf_text,
+                'label': label,
+                'pred': pred,
+                'cf_pred': cf_pred,
+                'prob': prob,
+                'cf_prob': cf_prob,
+                'prob_gap': abs(prob - cf_prob) if cf_prob is not None else None,
+                'orig_term': orig_term,
+                'swap_term': swap_term,
+                'category': cat,
+                'strict_valid': strict_valid,
+            })
 
     # Flip rate, probability gap, and pair accuracy (all swappable pairs).
     # Pair accuracy is stricter than flip rate: both original and CF must be correct.
@@ -286,8 +310,7 @@ def eval_fairness(model, test_examples, tokenizer):
     # Strict-valid subset: label-preserving pair만
     strict_res = [
         r for r, m in zip(results, meta)
-        if m[5] is not None and compute_validity_strict(
-            m[0], m[5], m[2], m[3], m[4])['use_for_ccr']
+        if m[5] is not None and r['strict_valid']
     ]
     strict_flip_rate = (sum(r['pred'] != r['cf_pred'] for r in strict_res) / len(strict_res)
                         if strict_res else 0.0)
@@ -330,6 +353,10 @@ def eval_fairness(model, test_examples, tokenizer):
     identity_fprs = {k: v for k, v in per_group_fpr.items() if k != 'none'}
     fpr_vals = list(identity_fprs.values())
     fpr_gap  = (max(fpr_vals) - min(fpr_vals)) if len(fpr_vals) >= 2 else 0.0
+    fairness_error_examples = collect_fairness_error_examples(
+        pair_records,
+        limit_per_bucket=MAX_ERROR_EXAMPLES_PER_BUCKET,
+    )
 
     return (
         flip_rate,
@@ -343,6 +370,7 @@ def eval_fairness(model, test_examples, tokenizer):
         fpr_gap,
         per_group_fpr,
         per_group_fpr_detail,
+        fairness_error_examples,
     )
 
 
@@ -364,6 +392,7 @@ def run_experiment(tag: str, mode: str, use_cons: bool, lam: float = LAMBDA,
         'fpr_gap': [],
         'fpr_min_group_n': [],
         'per_group_fpr_detail': [],
+        'fairness_error_examples': [],
         'config': {
             'tag': tag, 'mode': mode, 'use_cons': use_cons,
             'lambda': lam, 'lambda_strategy': lambda_strategy,
@@ -442,7 +471,8 @@ def run_experiment(tag: str, mode: str, use_cons: bool, lam: float = LAMBDA,
                                      num_workers=NUM_WORKERS))
         (
             flip, lgap, pair_acc, sflip, sgap, strict_pair_acc,
-            pair_count, strict_pair_count, fpr_gap, per_grp, per_grp_detail
+            pair_count, strict_pair_count, fpr_gap, per_grp, per_grp_detail,
+            fairness_error_examples
         ) = eval_fairness(model, test_data, tokenizer)
 
         print(f'  test F1={test_f1:.4f}  flip={flip:.4f}  prob_gap={lgap:.4f}  '
@@ -479,6 +509,10 @@ def run_experiment(tag: str, mode: str, use_cons: bool, lam: float = LAMBDA,
         ]
         metrics['fpr_min_group_n'].append(min(identity_group_ns) if identity_group_ns else 0)
         metrics['per_group_fpr_detail'].append(per_grp_detail)
+        metrics['fairness_error_examples'].append({
+            'seed': seed,
+            'examples': fairness_error_examples,
+        })
         metrics['epoch_history'].append({'seed': seed, 'epochs': seed_epochs})
 
         del model; gc.collect(); torch.cuda.empty_cache()

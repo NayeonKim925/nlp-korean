@@ -150,6 +150,74 @@ class ExperimentUtilsTest(unittest.TestCase):
     def test_unknown_experiment_tags_allows_empty_request(self):
         self.assertEqual(experiment_utils.unknown_experiment_tags(None, {"Baseline"}), [])
 
+    def test_collect_fairness_error_examples_buckets_pair_failures(self):
+        examples = experiment_utils.collect_fairness_error_examples([
+            {
+                "text": "A는 위험하다",
+                "cf_text": "B는 위험하다",
+                "label": 1,
+                "pred": 1,
+                "cf_pred": 0,
+                "prob": 0.9,
+                "cf_prob": 0.4,
+                "prob_gap": 0.5,
+                "orig_term": "A",
+                "swap_term": "B",
+                "category": "identity",
+                "strict_valid": True,
+            },
+            {
+                "text": "C가 행사에 왔다",
+                "cf_text": "D가 행사에 왔다",
+                "label": 0,
+                "pred": 1,
+                "cf_pred": 1,
+                "prob": 0.62,
+                "cf_prob": 0.61,
+                "prob_gap": 0.01,
+                "orig_term": "C",
+                "swap_term": "D",
+                "category": "identity",
+                "strict_valid": False,
+            },
+        ])
+
+        self.assertEqual(len(examples["strict_flip"]), 1)
+        self.assertEqual(examples["strict_flip"][0]["orig_term"], "A")
+        self.assertEqual(len(examples["orig_right_cf_wrong"]), 1)
+        self.assertEqual(len(examples["both_wrong"]), 1)
+        self.assertEqual(len(examples["false_positive_original"]), 1)
+        self.assertEqual(len(examples["false_positive_cf"]), 1)
+
+    def test_collect_fairness_error_examples_respects_limit_and_rounding(self):
+        records = [
+            {
+                "text": f"text {i}",
+                "cf_text": f"cf {i}",
+                "label": 1,
+                "pred": 1,
+                "cf_pred": 0,
+                "prob": 0.98765,
+                "cf_prob": 0.12345,
+                "prob_gap": 0.8642,
+                "orig_term": "A",
+                "swap_term": "B",
+                "category": "identity",
+                "strict_valid": True,
+            }
+            for i in range(3)
+        ]
+
+        examples = experiment_utils.collect_fairness_error_examples(
+            records,
+            limit_per_bucket=2,
+            digits=3,
+        )
+
+        self.assertEqual(len(examples["flip"]), 2)
+        self.assertEqual(examples["flip"][0]["prob"], 0.988)
+        self.assertEqual(examples["flip"][0]["cf_prob"], 0.123)
+
 
 if __name__ == "__main__":
     unittest.main()

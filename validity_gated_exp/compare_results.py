@@ -233,6 +233,9 @@ def audit_report_readiness(
         if fpr_min is not None and fpr_min < 20:
             warnings.append(f"{name} has low FPR support (FPR minN={fpr_min:.1f}); keep FPR Gap secondary.")
 
+        if not metrics.get("fairness_error_examples"):
+            warnings.append(f"{name} is missing fairness_error_examples; qualitative error analysis will be weaker.")
+
     if core_seed_counts and len(set(core_seed_counts.values())) > 1:
         failures.append(f"Core methods have different seed counts: {core_seed_counts}.")
     elif (
