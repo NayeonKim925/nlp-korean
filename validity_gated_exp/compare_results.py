@@ -39,6 +39,18 @@ def load_results(paths: list[Path]) -> dict[str, dict[str, Any]]:
     return results
 
 
+def duplicate_result_name(name: str, metrics: dict[str, Any], path: Path, existing: set[str]) -> str:
+    config = metrics.get("config")
+    lam = config.get("lambda") if isinstance(config, dict) else None
+    suffix = f"lambda={lam}, {path.stem}" if lam is not None else path.stem
+    candidate = f"{name} [{suffix}]"
+    i = 2
+    while candidate in existing:
+        candidate = f"{name} [{suffix}, dup{i}]"
+        i += 1
+    return candidate
+
+
 def load_results_with_metadata(paths: list[Path]) -> tuple[dict[str, dict[str, Any]], list[dict[str, Any]]]:
     merged: dict[str, dict[str, Any]] = {}
     metadata: list[dict[str, Any]] = []
@@ -52,7 +64,17 @@ def load_results_with_metadata(paths: list[Path]) -> tuple[dict[str, dict[str, A
             metadata.append({"path": str(path), "missing_meta": True})
         for name, metrics in data.items():
             if isinstance(metrics, dict) and "f1" in metrics:
-                merged[name] = {**metrics, "_source_path": str(path)}
+                result_name = name
+                duplicate_of = None
+                if result_name in merged:
+                    duplicate_of = name
+                    result_name = duplicate_result_name(name, metrics, path, set(merged))
+                merged[result_name] = {
+                    **metrics,
+                    "_source_path": str(path),
+                    "_original_name": duplicate_of or name,
+                    "_renamed_duplicate": duplicate_of is not None,
+                }
     return merged, metadata
 
 
@@ -149,6 +171,13 @@ def print_experiment_config_warnings(results: dict[str, dict[str, Any]]) -> None
     dirty_methods = [name for name, config in configs if config.get("git_dirty")]
     if dirty_methods:
         print(f"WARNING: experiments were run from dirty git state: {dirty_methods}")
+    renamed = [
+        (name, metrics.get("_original_name"), metrics.get("_source_path"))
+        for name, metrics in results.items()
+        if metrics.get("_renamed_duplicate")
+    ]
+    for name, original, source in renamed:
+        print(f"WARNING: duplicate experiment name '{original}' from {source} was renamed to '{name}'")
 
 
 def print_baseline_deltas(results: dict[str, dict[str, Any]]) -> None:

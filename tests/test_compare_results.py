@@ -107,6 +107,37 @@ class CompareResultsTest(unittest.TestCase):
             compare_results.print_metadata_warnings(metadata)
         self.assertIn("mix different git_commit", out.getvalue())
 
+    def test_duplicate_experiment_names_are_renamed_instead_of_overwritten(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            first = Path(tmpdir) / "strict_lam005.json"
+            second = Path(tmpdir) / "strict_lam02.json"
+            first.write_text(json.dumps({
+                "_meta": {"git_commit": "aaa", "gate_version": "v1", "model": "m"},
+                "Strict-Gated": {
+                    "f1": [0.79],
+                    "config": {"lambda": 0.05, "git_commit": "aaa", "gate_version": "v1", "model": "m"},
+                },
+            }), encoding="utf-8")
+            second.write_text(json.dumps({
+                "_meta": {"git_commit": "aaa", "gate_version": "v1", "model": "m"},
+                "Strict-Gated": {
+                    "f1": [0.81],
+                    "config": {"lambda": 0.2, "git_commit": "aaa", "gate_version": "v1", "model": "m"},
+                },
+            }), encoding="utf-8")
+            results, _ = compare_results.load_results_with_metadata([first, second])
+
+        self.assertIn("Strict-Gated", results)
+        renamed = [name for name in results if name.startswith("Strict-Gated [")]
+        self.assertEqual(len(renamed), 1)
+        self.assertEqual(results["Strict-Gated"]["f1"], [0.79])
+        self.assertEqual(results[renamed[0]]["f1"], [0.81])
+
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out):
+            compare_results.print_experiment_config_warnings(results)
+        self.assertIn("duplicate experiment name", out.getvalue())
+
     def test_experiment_config_warning_for_mixed_commits_and_dirty_state(self):
         results = {
             "Naive Swap": {

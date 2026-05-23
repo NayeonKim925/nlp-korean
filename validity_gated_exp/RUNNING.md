@@ -224,6 +224,7 @@ python validity_gated_exp/compare_results.py \
 - `mix different git_commit`, `gate_version`, `model`, `max_len` 경고가 뜨면 같은 표에 직접 비교하지 않습니다.
 - `dirty=True`가 보이면 uncommitted local code로 돌린 결과이므로, 보고서용 결과로 쓰기 전에 commit된 상태에서 다시 실행합니다.
 - lambda follow-up은 가능하면 별도 `--result_path`에 저장하고, `compare_results.py`로 여러 JSON을 함께 읽습니다.
+- 여러 JSON 안에 같은 experiment name이 있으면 두 번째부터 자동으로 `Strict-Gated [lambda=..., file]`처럼 이름이 바뀝니다. 이 경고가 보이면 표에 들어갈 행 이름을 수동으로 확인합니다.
 
 ## 7. Hardware Notes
 
