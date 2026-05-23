@@ -112,6 +112,48 @@ class CompareResultsTest(unittest.TestCase):
         self.assertEqual(compare_results.paired_delta([0.83], [0.82, 0.83]), [])
         self.assertEqual(compare_results.paired_delta([0.83, float("nan")], [0.82, 0.83]), [])
 
+    def test_error_example_summary_and_printer_use_saved_buckets(self):
+        results = {
+            "Naive Swap": {
+                "f1": [0.79],
+                "fairness_error_examples": [{
+                    "seed": 42,
+                    "examples": {
+                        "both_wrong": [{
+                            "text": "원문 예시가 매우 길어도 표시는 짧게 한다",
+                            "cf_text": "대체 예시",
+                            "label": 0,
+                            "pred": 1,
+                            "cf_pred": 1,
+                            "prob": 0.8,
+                            "cf_prob": 0.7,
+                            "prob_gap": 0.1,
+                            "category": "ethnicity",
+                            "orig_term": "A",
+                            "swap_term": "B",
+                            "strict_valid": False,
+                        }],
+                        "strict_flip": [],
+                        "false_positive_original": [],
+                        "false_positive_cf": [],
+                    },
+                }],
+            }
+        }
+
+        self.assertEqual(compare_results.bucket_example_count(results["Naive Swap"], "both_wrong"), 1)
+
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out):
+            compare_results.print_error_example_summary(results)
+            compare_results.print_error_examples(results, ["both_wrong"], max_examples=1)
+        text = out.getvalue()
+        self.assertIn("Saved qualitative examples", text)
+        self.assertIn("Naive Swap", text)
+        self.assertIn("[both_wrong]", text)
+        self.assertIn("label=0 pred=1 cf_pred=1", text)
+        self.assertIn("orig: 원문 예시", text)
+
     def test_naive_vs_best_gated_diagnostic_prints_seed_consistency(self):
         results = {
             "Naive Swap": {

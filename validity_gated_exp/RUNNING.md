@@ -230,6 +230,18 @@ python validity_gated_exp/compare_results.py \
 
 각 experiment 결과에는 seed별 `fairness_error_examples`가 저장됩니다. 이 필드는 `flip`, `strict_flip`, `both_wrong`, `strict_both_wrong`, `orig_wrong_cf_right`, `orig_right_cf_wrong`, `false_positive_original`, `false_positive_cf` 예시를 최대 5개씩 담습니다. 낮은 flip rate가 정말 좋은 robustness인지, 아니면 원문과 CF를 둘 다 틀려서 생긴 착시인지 확인할 때 씁니다.
 
+정성 분석 예시를 바로 보려면:
+
+```bash
+python validity_gated_exp/compare_results.py \
+  validity_gated_exp/results_core.json \
+  --show_examples \
+  --example_bucket both_wrong \
+  --example_bucket strict_flip \
+  --example_bucket false_positive_original \
+  --max_examples 2
+```
+
 비교 출력 맨 위의 `Result metadata`와 `Experiment configs`를 먼저 확인합니다.
 
 - `missing _meta` 또는 `missing per-experiment config`가 뜨는 old result는 final table에 섞지 않습니다.

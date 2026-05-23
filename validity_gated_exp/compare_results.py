@@ -18,7 +18,7 @@ from pathlib import Path
 from statistics import mean, pstdev
 from typing import Any
 
-from experiment_utils import unique_result_name
+from experiment_utils import ERROR_EXAMPLE_BUCKETS, unique_result_name
 
 
 PRIMARY_METRICS = [
@@ -159,6 +159,39 @@ def metric_seed_count(values: Any) -> int:
         return 0
     valid = [v for v in values if isinstance(v, (int, float)) and not math.isnan(v)]
     return len(valid)
+
+
+def iter_error_examples(metrics: dict[str, Any], bucket: str):
+    """Yield saved qualitative examples for one bucket across seeds."""
+    saved = metrics.get("fairness_error_examples")
+    if not isinstance(saved, list):
+        return
+    for seed_entry in saved:
+        if not isinstance(seed_entry, dict):
+            continue
+        seed = seed_entry.get("seed")
+        examples_by_bucket = seed_entry.get("examples")
+        if not isinstance(examples_by_bucket, dict):
+            continue
+        examples = examples_by_bucket.get(bucket, [])
+        if not isinstance(examples, list):
+            continue
+        for example in examples:
+            if isinstance(example, dict):
+                yield seed, example
+
+
+def bucket_example_count(metrics: dict[str, Any], bucket: str) -> int:
+    return sum(1 for _ in iter_error_examples(metrics, bucket))
+
+
+def shorten(text: Any, max_chars: int = 90) -> str:
+    if text is None:
+        return ""
+    text = str(text).replace("\n", " ")
+    if len(text) <= max_chars:
+        return text
+    return text[: max_chars - 3] + "..."
 
 
 def audit_report_readiness(
@@ -555,6 +588,59 @@ def print_report_readiness_audit(results: dict[str, dict[str, Any]], metadata: l
         print(f"PASS: {item}")
 
 
+def print_error_example_summary(results: dict[str, dict[str, Any]]) -> None:
+    print("\nSaved qualitative examples")
+    print("--------------------------")
+    print("Counts are capped saved examples, not total error counts.")
+    buckets = [
+        "flip",
+        "strict_flip",
+        "both_wrong",
+        "strict_both_wrong",
+        "false_positive_original",
+        "false_positive_cf",
+    ]
+    name_w = max(12, *(len(name) for name in results))
+    header = ["Experiment"] + buckets
+    widths = [name_w] + [max(8, len(bucket)) for bucket in buckets]
+    print("  ".join(item.ljust(width) for item, width in zip(header, widths)))
+    print("  ".join("-" * width for width in widths))
+    for name, metrics in results.items():
+        row = [name.ljust(name_w)]
+        for bucket, width in zip(buckets, widths[1:]):
+            row.append(str(bucket_example_count(metrics, bucket)).rjust(width))
+        print("  ".join(row))
+
+
+def print_error_examples(
+    results: dict[str, dict[str, Any]],
+    buckets: list[str],
+    max_examples: int,
+) -> None:
+    print("\nQualitative error examples")
+    print("--------------------------")
+    for bucket in buckets:
+        print(f"\n[{bucket}]")
+        any_printed = False
+        for name, metrics in results.items():
+            for i, (seed, ex) in enumerate(iter_error_examples(metrics, bucket)):
+                if i >= max_examples:
+                    break
+                any_printed = True
+                print(
+                    f"- {name} seed={seed} label={ex.get('label')} "
+                    f"pred={ex.get('pred')} cf_pred={ex.get('cf_pred')} "
+                    f"prob={ex.get('prob')} cf_prob={ex.get('cf_prob')} "
+                    f"gap={ex.get('prob_gap')} cat={ex.get('category')} "
+                    f"terms={ex.get('orig_term')}->{ex.get('swap_term')} "
+                    f"strict={ex.get('strict_valid')}"
+                )
+                print(f"  orig: {shorten(ex.get('text'))}")
+                print(f"  cf  : {shorten(ex.get('cf_text'))}")
+        if not any_printed:
+            print("- No saved examples.")
+
+
 def print_markdown_table(results: dict[str, dict[str, Any]]) -> None:
     print("\nMarkdown table")
     print("--------------")
@@ -574,6 +660,23 @@ def print_markdown_table(results: dict[str, dict[str, Any]]) -> None:
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("json", nargs="+", type=Path, help="result JSON path(s)")
+    parser.add_argument(
+        "--show_examples",
+        action="store_true",
+        help="print saved qualitative error examples after the summary",
+    )
+    parser.add_argument(
+        "--example_bucket",
+        action="append",
+        choices=ERROR_EXAMPLE_BUCKETS,
+        help="bucket to print with --show_examples; repeatable",
+    )
+    parser.add_argument(
+        "--max_examples",
+        type=int,
+        default=2,
+        help="max examples per experiment and bucket when --show_examples is used",
+    )
     args = parser.parse_args()
     results, metadata = load_results_with_metadata(args.json)
     if not results:
@@ -587,6 +690,10 @@ def main() -> None:
     print_naive_vs_best_gated_diagnostic(results)
     print_next_step_recommendations(results)
     print_report_readiness_audit(results, metadata)
+    print_error_example_summary(results)
+    if args.show_examples:
+        buckets = args.example_bucket or ["both_wrong", "strict_flip", "false_positive_original"]
+        print_error_examples(results, buckets, args.max_examples)
     print_markdown_table(results)
 
 
