@@ -27,6 +27,33 @@ AVAILABLE_EXPERIMENT_TAGS = (
 
 CORE_REPORT_EXPERIMENTS = ("Baseline", "Naive Swap", "Strict-Gated")
 
+RESUME_CONFIG_KEYS = (
+    "tag",
+    "mode",
+    "use_cons",
+    "lambda",
+    "lambda_strategy",
+    "epochs",
+    "model",
+    "max_len",
+    "batch_size",
+    "lr",
+    "weight_decay",
+    "gate_version",
+    "git_commit",
+    "git_dirty",
+)
+
+RESUME_METRIC_KEYS = (
+    "f1",
+    "flip_rate",
+    "prob_gap",
+    "pair_accuracy",
+    "strict_flip_rate",
+    "strict_prob_gap",
+    "strict_pair_accuracy",
+)
+
 
 def coverage_matched_lambda(
     base_lambda: float,
@@ -109,6 +136,75 @@ def build_result_snapshot(
         "is_final": bool(is_final),
     }
     return snapshot
+
+
+def config_mismatches(existing_config: dict | None, expected_config: dict, keys=RESUME_CONFIG_KEYS) -> list[str]:
+    """Return config keys that differ enough to prevent safe result reuse."""
+    if not isinstance(existing_config, dict):
+        return ["<missing config>"]
+    return [
+        key for key in keys
+        if existing_config.get(key) != expected_config.get(key)
+    ]
+
+
+def completed_seed_set(metrics: dict) -> set[int] | None:
+    """Return completed seeds when epoch_history records them, otherwise None."""
+    histories = metrics.get("epoch_history")
+    if not isinstance(histories, list) or not histories:
+        return None
+    seeds: set[int] = set()
+    for item in histories:
+        if not isinstance(item, dict) or "seed" not in item:
+            return None
+        try:
+            seeds.add(int(item["seed"]))
+        except (TypeError, ValueError):
+            return None
+    return seeds
+
+
+def has_complete_metric_arrays(metrics: dict, required_count: int, keys=RESUME_METRIC_KEYS) -> bool:
+    """Check that all core metric arrays contain at least the requested seed count."""
+    for key in keys:
+        values = metrics.get(key)
+        if not isinstance(values, list) or len(values) < required_count:
+            return False
+    return True
+
+
+def can_resume_result(
+    existing_results: dict,
+    tag: str,
+    expected_config: dict,
+    required_seeds: list[int],
+) -> tuple[bool, str]:
+    """Decide whether a saved experiment row is safe to reuse.
+
+    Reusing partial report runs is useful, but only if the row matches the
+    current method/config and has evidence for every requested seed.
+    """
+    metrics = existing_results.get(tag)
+    if not isinstance(metrics, dict):
+        return False, "no saved result row"
+    if "f1" not in metrics:
+        return False, "saved row has no F1 metrics"
+
+    mismatches = config_mismatches(metrics.get("config"), expected_config)
+    if mismatches:
+        return False, "config mismatch: " + ", ".join(mismatches)
+
+    required_count = len(required_seeds)
+    if not has_complete_metric_arrays(metrics, required_count):
+        return False, f"incomplete metric arrays for {required_count} requested seed(s)"
+
+    completed_seeds = completed_seed_set(metrics)
+    if completed_seeds is not None:
+        missing = sorted(set(required_seeds) - completed_seeds)
+        if missing:
+            return False, f"missing requested seed(s): {missing}"
+
+    return True, "complete compatible result"
 
 
 def parse_strict_lambda_tags(exp_tags: list[str] | None) -> list[float]:

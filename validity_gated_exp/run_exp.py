@@ -37,6 +37,7 @@ from dataset import (
 )
 from experiment_utils import (
     build_result_snapshot,
+    can_resume_result,
     collect_fairness_error_examples,
     coverage_matched_lambda,
     merge_result_maps,
@@ -367,6 +368,25 @@ def eval_fairness(model, test_examples, tokenizer):
     )
 
 
+def experiment_config(
+    tag: str,
+    mode: str,
+    use_cons: bool,
+    lam: float,
+    n_epochs: int,
+    lambda_strategy: str = 'fixed',
+) -> dict:
+    return {
+        'tag': tag, 'mode': mode, 'use_cons': use_cons,
+        'lambda': lam, 'lambda_strategy': lambda_strategy,
+        'epochs': n_epochs,
+        'model': MODEL_NAME, 'max_len': MAX_LEN, 'batch_size': BATCH_SIZE,
+        'lr': LR, 'weight_decay': WEIGHT_DECAY,
+        'gate_version': GATE_VERSION, 'git_commit': git_commit(),
+        'git_dirty': git_dirty(),
+    }
+
+
 # ── Experiment runner ─────────────────────────────────────────────────────────
 def run_experiment(tag: str, mode: str, use_cons: bool, lam: float = LAMBDA,
                    seeds=None, n_epochs: int = EPOCHS,
@@ -386,15 +406,7 @@ def run_experiment(tag: str, mode: str, use_cons: bool, lam: float = LAMBDA,
         'fpr_min_group_n': [],
         'per_group_fpr_detail': [],
         'fairness_error_examples': [],
-        'config': {
-            'tag': tag, 'mode': mode, 'use_cons': use_cons,
-            'lambda': lam, 'lambda_strategy': lambda_strategy,
-            'epochs': n_epochs,
-            'model': MODEL_NAME, 'max_len': MAX_LEN, 'batch_size': BATCH_SIZE,
-            'lr': LR, 'weight_decay': WEIGHT_DECAY,
-            'gate_version': GATE_VERSION, 'git_commit': git_commit(),
-            'git_dirty': git_dirty(),
-        },
+        'config': experiment_config(tag, mode, use_cons, lam, n_epochs, lambda_strategy),
         'epoch_history': [],   # [{seed, epochs: [{ep, val_f1, total_loss, cls_loss, cons_loss}]}]
     }
 
@@ -550,6 +562,8 @@ if __name__ == '__main__':
     parser.add_argument('--base_dir', default=None,
                         help='directory for data/checkpoints/results; default is script directory')
     parser.add_argument('--result_path', default=None)
+    parser.add_argument('--resume_completed', action='store_true',
+                        help='reuse completed compatible rows already saved in --result_path')
     args = parser.parse_args()
     try:
         requested_base_exps, lam_targets = resolve_requested_experiments(args.exp)
@@ -727,12 +741,48 @@ if __name__ == '__main__':
 
     for exp in run_ablations:
         print(f"\n{'#'*60}\n  Experiment: {exp['tag']}\n{'#'*60}")
+        if args.resume_completed:
+            expected_config = experiment_config(
+                exp['tag'],
+                exp['mode'],
+                exp['use_cons'],
+                exp['lam'],
+                EPOCHS,
+                exp.get('lambda_strategy', 'fixed'),
+            )
+            can_resume, reason = can_resume_result(
+                existing_results_for_merge,
+                exp['tag'],
+                expected_config,
+                SEEDS,
+            )
+            if can_resume:
+                print(f'  SKIP: reusing completed compatible result from {RESULT_PATH} ({reason})')
+                all_results[exp['tag']] = existing_results_for_merge[exp['tag']]
+                continue
+            if exp['tag'] in existing_results_for_merge:
+                print(f'  Cannot resume saved row: {reason}; retraining.')
         all_results[exp['tag']] = run_experiment(**exp, cf_lookup=cf_lookup)
         save_results_snapshot(f'after {exp["tag"]}')
 
     # λ sensitivity (Strict-Gated; lam=0.1 is already in ABLATIONS)
     for lam in lam_targets:
         key = f'Strict_lam={lam}'
+        if args.resume_completed:
+            expected_config = experiment_config(key, 'strict', True, lam, EPOCHS, 'fixed')
+            can_resume, reason = can_resume_result(
+                existing_results_for_merge,
+                key,
+                expected_config,
+                SEEDS,
+            )
+            if can_resume:
+                print(f"\n{'#'*60}\n  Experiment: {key}\n{'#'*60}")
+                print(f'  SKIP: reusing completed compatible result from {RESULT_PATH} ({reason})')
+                all_results[key] = existing_results_for_merge[key]
+                continue
+            if key in existing_results_for_merge:
+                print(f'  Cannot resume saved row for {key}: {reason}; retraining.')
         all_results[key] = run_experiment(
             tag=key, mode='strict', use_cons=True, lam=lam, n_epochs=EPOCHS,
             cf_lookup=cf_lookup)

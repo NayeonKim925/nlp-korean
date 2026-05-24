@@ -108,6 +108,7 @@ python validity_gated_exp/run_exp.py \
 Make sure each `\` is the final character on its line. A trailing space after `\` can break the command.
 
 The script checkpoint-saves after each experiment. If the run stops midway, inspect the partial JSON before restarting.
+To continue a compatible partial run without retraining completed rows, rerun the same command with `--resume_completed`.
 
 ## 5. Compare
 

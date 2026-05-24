@@ -241,6 +241,140 @@ class ExperimentUtilsTest(unittest.TestCase):
         self.assertEqual(examples["flip"][0]["prob"], 0.988)
         self.assertEqual(examples["flip"][0]["cf_prob"], 0.123)
 
+    def test_config_mismatches_reports_changed_resume_keys(self):
+        expected = {
+            "tag": "Strict-Gated",
+            "mode": "strict",
+            "lambda": 0.1,
+            "git_commit": "abc123",
+        }
+        existing = {**expected, "lambda": 0.2}
+
+        mismatches = experiment_utils.config_mismatches(
+            existing,
+            expected,
+            keys=("tag", "mode", "lambda", "git_commit"),
+        )
+
+        self.assertEqual(mismatches, ["lambda"])
+
+    def test_can_resume_result_accepts_complete_compatible_row(self):
+        config = {
+            "tag": "Baseline",
+            "mode": "none",
+            "use_cons": False,
+            "lambda": 0.0,
+            "lambda_strategy": "fixed",
+            "epochs": 3,
+            "model": "klue/roberta-base",
+            "max_len": 128,
+            "batch_size": 64,
+            "lr": 3e-5,
+            "weight_decay": 0.01,
+            "gate_version": "v1",
+            "git_commit": "abc123",
+            "git_dirty": False,
+        }
+        row = {
+            "config": config,
+            "f1": [0.7, 0.71, 0.72],
+            "flip_rate": [0.1, 0.11, 0.12],
+            "prob_gap": [0.01, 0.02, 0.03],
+            "pair_accuracy": [0.8, 0.81, 0.82],
+            "strict_flip_rate": [0.1, 0.11, 0.12],
+            "strict_prob_gap": [0.01, 0.02, 0.03],
+            "strict_pair_accuracy": [0.8, 0.81, 0.82],
+            "epoch_history": [{"seed": 42}, {"seed": 123}, {"seed": 456}],
+        }
+
+        ok, reason = experiment_utils.can_resume_result(
+            {"Baseline": row},
+            "Baseline",
+            config,
+            [42, 123, 456],
+        )
+
+        self.assertTrue(ok)
+        self.assertIn("complete", reason)
+
+    def test_can_resume_result_rejects_missing_seed(self):
+        config = {
+            "tag": "Baseline",
+            "mode": "none",
+            "use_cons": False,
+            "lambda": 0.0,
+            "lambda_strategy": "fixed",
+            "epochs": 3,
+            "model": "klue/roberta-base",
+            "max_len": 128,
+            "batch_size": 64,
+            "lr": 3e-5,
+            "weight_decay": 0.01,
+            "gate_version": "v1",
+            "git_commit": "abc123",
+            "git_dirty": False,
+        }
+        row = {
+            "config": config,
+            "f1": [0.7, 0.71, 0.72],
+            "flip_rate": [0.1, 0.11, 0.12],
+            "prob_gap": [0.01, 0.02, 0.03],
+            "pair_accuracy": [0.8, 0.81, 0.82],
+            "strict_flip_rate": [0.1, 0.11, 0.12],
+            "strict_prob_gap": [0.01, 0.02, 0.03],
+            "strict_pair_accuracy": [0.8, 0.81, 0.82],
+            "epoch_history": [{"seed": 42}, {"seed": 123}, {"seed": 999}],
+        }
+
+        ok, reason = experiment_utils.can_resume_result(
+            {"Baseline": row},
+            "Baseline",
+            config,
+            [42, 123, 456],
+        )
+
+        self.assertFalse(ok)
+        self.assertIn("missing requested seed", reason)
+
+    def test_can_resume_result_rejects_config_mismatch(self):
+        config = {
+            "tag": "Strict-Gated",
+            "mode": "strict",
+            "use_cons": True,
+            "lambda": 0.1,
+            "lambda_strategy": "fixed",
+            "epochs": 3,
+            "model": "klue/roberta-base",
+            "max_len": 128,
+            "batch_size": 64,
+            "lr": 3e-5,
+            "weight_decay": 0.01,
+            "gate_version": "v1",
+            "git_commit": "abc123",
+            "git_dirty": False,
+        }
+        row = {
+            "config": {**config, "lambda": 0.2},
+            "f1": [0.7, 0.71, 0.72],
+            "flip_rate": [0.1, 0.11, 0.12],
+            "prob_gap": [0.01, 0.02, 0.03],
+            "pair_accuracy": [0.8, 0.81, 0.82],
+            "strict_flip_rate": [0.1, 0.11, 0.12],
+            "strict_prob_gap": [0.01, 0.02, 0.03],
+            "strict_pair_accuracy": [0.8, 0.81, 0.82],
+            "epoch_history": [{"seed": 42}, {"seed": 123}, {"seed": 456}],
+        }
+
+        ok, reason = experiment_utils.can_resume_result(
+            {"Strict-Gated": row},
+            "Strict-Gated",
+            config,
+            [42, 123, 456],
+        )
+
+        self.assertFalse(ok)
+        self.assertIn("config mismatch", reason)
+
 
 if __name__ == "__main__":
     unittest.main()
