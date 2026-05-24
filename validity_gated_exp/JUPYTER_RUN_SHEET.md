@@ -20,8 +20,26 @@ Expected:
 
 ```bash
 source .venv/bin/activate
-python -c "import torch; print(torch.__version__); print(torch.cuda.is_available()); print(torch.cuda.get_device_name(0) if torch.cuda.is_available() else 'no cuda')"
-df -h
+python validity_gated_exp/env_check.py --require_cuda --require_clean --min_free_gb 15
+```
+
+Expected:
+
+- `ENV CHECK PASS`
+- CUDA is available
+- `sklearn [scikit-learn]`, `torch`, `transformers`, `datasets`, and `kiwipiepy` all pass
+- at least 15GB free disk space
+
+If a package fails, install the missing dependency before the smoke run. For example, `ModuleNotFoundError: No module named 'sklearn'` means:
+
+```bash
+python -m pip install scikit-learn
+```
+
+If several packages are missing:
+
+```bash
+python -m pip install -r validity_gated_exp/requirements.txt
 ```
 
 If CUDA is false, stop before the full run unless you intentionally want a slow CPU run.
@@ -84,6 +102,8 @@ python validity_gated_exp/run_exp.py \
   --result_path validity_gated_exp/results_core_followup.json \
   2>&1 | tee train_core_followup.log
 ```
+
+Make sure each `\` is the final character on its line. A trailing space after `\` can break the command.
 
 The script checkpoint-saves after each experiment. If the run stops midway, inspect the partial JSON before restarting.
 

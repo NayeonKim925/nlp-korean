@@ -43,6 +43,18 @@ python -m pip install torch torchvision torchaudio --index-url https://download.
 python -m pip install -r validity_gated_exp/requirements.txt
 ```
 
+설치가 끝나면 학습 스크립트보다 먼저 환경 검사를 실행합니다.
+
+```bash
+python validity_gated_exp/env_check.py --require_cuda --min_free_gb 15
+```
+
+`ModuleNotFoundError: No module named 'sklearn'`가 나오면 import 이름과 pip 이름이 달라서 생기는 전형적인 설치 누락입니다.
+
+```bash
+python -m pip install scikit-learn
+```
+
 Jupyter에서 이 venv를 커널로 쓰려면:
 
 ```bash
@@ -133,6 +145,8 @@ python validity_gated_exp/run_exp.py \
   --result_path validity_gated_exp/results_core_followup.json \
   2>&1 | tee train_core_followup.log
 ```
+
+주의: 여러 줄 명령어에서 `\` 뒤에 공백을 넣지 마세요. `\`는 줄의 마지막 문자여야 합니다.
 
 `Validity-Gated`와 `Masking Cons Reg`는 시간이 남으면 보조 ablation으로 추가합니다. 먼저 위 6개 행이 있어야 Naive vs gated claim을 안전하게 정할 수 있습니다.
 
