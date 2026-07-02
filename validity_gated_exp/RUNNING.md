@@ -292,6 +292,7 @@ python validity_gated_exp/compare_results.py \
 ## 7. Hardware Notes
 
 - CUDA GPU: start with `--batch_size 64`. If memory is enough, try 128.
+- CUDA out of memory가 나면 `--batch_size 32`로, 그래도 부족하면 `16`으로 낮춰 재시도합니다.
 - Mac MPS or CPU: use `--batch_size 8` or `16`, and smoke test first.
 - `--num_workers 0` is safer in notebooks. If stable, use `2` or `4`.
 - `2>&1 | tee file.log` means stderr와 stdout을 합쳐서 화면과 로그 파일에 동시에 저장한다는 뜻입니다.

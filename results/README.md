@@ -13,30 +13,36 @@ results/
   raw/          # JSON result files from run_exp.py
   summaries/    # compare_results.py text outputs and qualitative examples
   tables/       # cleaned markdown/CSV tables for the report
-  logs/         # optional notes about training logs; *.log files are ignored
+                #   (currently: results_masking.csv, results_strict_lam005.csv,
+                #    results_strict_lam025.csv from run_exp.py)
+  logs/         # training log notes; new *.log files are git-ignored
+                #   (currently: train_core_followup.log, kept as run evidence)
 ```
 
-## Required Raw JSON Files
+## Raw JSON Files
 
-Put the final JSON files here with these exact names:
+The final shared JSON files are:
 
 ```text
 results/raw/results_core_followup.json
-results/raw/results_masking_cons_reg.json
-results/raw/results_strict_lam_005.json
-results/raw/results_strict_lam_015.json
-results/raw/results_strict_lam_025.json
+results/raw/results_masking.json
+results/raw/results_strict_lam005.json
+results/raw/results_strict_lam025.json
 ```
 
-Expected contents:
+Actual contents:
 
-| File | Expected rows |
+| File | Rows |
 | --- | --- |
-| `results_core_followup.json` | `Baseline`, `Naive Swap`, `Strict-Gated`, `Strict-Matched` |
-| `results_masking_cons_reg.json` | `Masking Cons Reg` |
-| `results_strict_lam_005.json` | `Strict_lam=0.05` |
-| `results_strict_lam_015.json` | `Strict_lam=0.15` |
-| `results_strict_lam_025.json` | `Strict_lam=0.25` |
+| `results_core_followup.json` | `Baseline`, `Naive Swap`, `Strict-Gated`, `Strict-Matched`, `Strict_lam=0.15` |
+| `results_masking.json` | `Masking Cons Reg` |
+| `results_strict_lam005.json` | `Strict-Matched` (rerun), `Strict_lam=0.05` |
+| `results_strict_lam025.json` | `Strict-Matched` (rerun), `Strict_lam=0.25` |
+
+Note: there is no separate `Strict_lam=0.15` file; that row lives inside
+`results_core_followup.json`. The `Strict-Matched` rows in the two lambda files
+are independent reruns; the paper numbers come from
+`results_core_followup.json`.
 
 If one run file also contains extra rows, keep it, but do not overwrite another
 teammate's JSON with a different result path.
@@ -55,10 +61,9 @@ Use:
 ```bash
 python validity_gated_exp/compare_results.py \
   results/raw/results_core_followup.json \
-  results/raw/results_masking_cons_reg.json \
-  results/raw/results_strict_lam_005.json \
-  results/raw/results_strict_lam_015.json \
-  results/raw/results_strict_lam_025.json \
+  results/raw/results_masking.json \
+  results/raw/results_strict_lam005.json \
+  results/raw/results_strict_lam025.json \
   --show_examples \
   --example_bucket strict_flip \
   --example_bucket both_wrong \
@@ -78,10 +83,9 @@ from pathlib import Path
 
 paths = [
     "results/raw/results_core_followup.json",
-    "results/raw/results_masking_cons_reg.json",
-    "results/raw/results_strict_lam_005.json",
-    "results/raw/results_strict_lam_015.json",
-    "results/raw/results_strict_lam_025.json",
+    "results/raw/results_masking.json",
+    "results/raw/results_strict_lam005.json",
+    "results/raw/results_strict_lam025.json",
 ]
 
 for p in paths:
@@ -105,7 +109,7 @@ PY
 
 ## Naming Rules
 
-- Use lowercase lambda filenames: `005`, `015`, `025`.
+- Use lowercase lambda filenames without extra underscores: `lam005`, `lam025`.
 - Keep raw files as `.json`.
 - Keep human-readable summaries as `.txt` or `.md`.
 - Do not commit model checkpoints or Hugging Face caches.
