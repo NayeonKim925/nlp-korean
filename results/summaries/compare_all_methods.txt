@@ -1,0 +1,502 @@
+Result metadata
+---------------
+- results/raw/results_core_followup.json: commit=abebc67 gate=2026-05-24-strict-context-v2 model=klue/roberta-base lambda=0.1 seeds=[42, 123, 456]
+- results/raw/results_masking.json: commit=abebc67 gate=2026-05-24-strict-context-v2 model=klue/roberta-base lambda=0.1 seeds=[42, 123, 456]
+- results/raw/results_strict_lam005.json: commit=57380c4 gate=2026-05-24-strict-context-v2 model=klue/roberta-base lambda=0.1 seeds=[42, 123, 456]
+- results/raw/results_strict_lam025.json: commit=abebc67 gate=2026-05-24-strict-context-v2 model=klue/roberta-base lambda=0.1 seeds=[42, 123, 456]
+WARNING: result files mix different git_commit values: ['57380c4', 'abebc67']
+WARNING: result files were produced from dirty git state: ['results/raw/results_masking.json', 'results/raw/results_strict_lam025.json']
+
+Experiment configs
+------------------
+- Baseline: mode=none lambda=0.0 strategy=fixed commit=abebc67 dirty=False gate=2026-05-24-strict-context-v2 model=klue/roberta-base
+- Naive Swap: mode=swap lambda=0.1 strategy=fixed commit=abebc67 dirty=False gate=2026-05-24-strict-context-v2 model=klue/roberta-base
+- Strict-Gated: mode=strict lambda=0.1 strategy=fixed commit=abebc67 dirty=False gate=2026-05-24-strict-context-v2 model=klue/roberta-base
+- Strict-Matched: mode=strict lambda=0.12969483568075119 strategy=coverage_matched_to_naive commit=abebc67 dirty=False gate=2026-05-24-strict-context-v2 model=klue/roberta-base
+- Strict_lam=0.15: mode=strict lambda=0.15 strategy=fixed commit=abebc67 dirty=True gate=2026-05-24-strict-context-v2 model=klue/roberta-base
+- Masking Cons Reg: mode=mask lambda=0.1 strategy=fixed commit=abebc67 dirty=True gate=2026-05-24-strict-context-v2 model=klue/roberta-base
+- Strict-Matched [lambda=0.12969483568075119, results_strict_lam005]: mode=strict lambda=0.12969483568075119 strategy=coverage_matched_to_naive commit=57380c4 dirty=False gate=2026-05-24-strict-context-v2 model=klue/roberta-base
+- Strict_lam=0.05: mode=strict lambda=0.05 strategy=fixed commit=57380c4 dirty=False gate=2026-05-24-strict-context-v2 model=klue/roberta-base
+- Strict-Matched [lambda=0.12969483568075119, results_strict_lam025]: mode=strict lambda=0.12969483568075119 strategy=coverage_matched_to_naive commit=abebc67 dirty=True gate=2026-05-24-strict-context-v2 model=klue/roberta-base
+- Strict_lam=0.25: mode=strict lambda=0.25 strategy=fixed commit=abebc67 dirty=True gate=2026-05-24-strict-context-v2 model=klue/roberta-base
+WARNING: experiments mix different git_commit values: ['57380c4', 'abebc67']
+WARNING: experiments were run from dirty git state: ['Strict_lam=0.15', 'Masking Cons Reg', 'Strict-Matched [lambda=0.12969483568075119, results_strict_lam025]', 'Strict_lam=0.25']
+WARNING: duplicate experiment name 'Strict-Matched' from results/raw/results_strict_lam005.json was renamed to 'Strict-Matched [lambda=0.12969483568075119, results_strict_lam005]'
+WARNING: duplicate experiment name 'Strict-Matched' from results/raw/results_strict_lam025.json was renamed to 'Strict-Matched [lambda=0.12969483568075119, results_strict_lam025]'
+
+Experiment                                                          F1             PairAcc        S-PairAcc      Flip           S-Flip         ProbGap        S-ProbGap      FPRGap         FPR minN       TrainCF%       ConsBatch%     ValidCF/B    
+------------------------------------------------------------------  -------------  -------------  -------------  -------------  -------------  -------------  -------------  -------------  -------------  -------------  -------------  -------------
+Baseline                                                            0.7882±0.0026  0.8029±0.0102  0.8076±0.0128  0.0549±0.0112  0.0543±0.0123  0.0440±0.0049  0.0447±0.0034  0.4785±0.1983  3.0000±0.0000  0.0000±0.0000  0.0000±0.0000  0.0000±0.0000
+Naive Swap                                                          0.7916±0.0017  0.8168±0.0037  0.8171±0.0023  0.0212±0.0041  0.0229±0.0040  0.0168±0.0006  0.0165±0.0009  0.4669±0.1560  3.0000±0.0000  4.4930±0.0000  94.8162±0.1519  2.8755±0.0000
+Strict-Gated                                                        0.7907±0.0035  0.8220±0.0047  0.8248±0.0088  0.0234±0.0090  0.0219±0.0097  0.0198±0.0012  0.0190±0.0008  0.6481±0.1440  3.0000±0.0000  3.4643±0.0000  89.5415±0.1854  2.2171±0.0000
+Strict-Matched                                                      0.7906±0.0041  0.8264±0.0031  0.8295±0.0110  0.0205±0.0037  0.0200±0.0084  0.0176±0.0009  0.0166±0.0006  0.5162±0.2876  3.0000±0.0000  3.4643±0.0000  89.5415±0.1854  2.2171±0.0000
+Strict_lam=0.15                                                     0.7917±0.0014  0.8249±0.0010  0.8305±0.0013  0.0190±0.0055  0.0181±0.0036  0.0168±0.0017  0.0160±0.0009  0.5093±0.1762  3.0000±0.0000  3.4643±0.0000  89.5415±0.1854  2.2171±0.0000
+Masking Cons Reg                                                    0.7901±0.0020  0.8110±0.0100  0.8133±0.0110  0.0491±0.0081  0.0495±0.0067  0.0435±0.0045  0.0452±0.0040  0.4653±0.1571  3.0000±0.0000  4.4930±0.0000  94.8162±0.1519  2.8755±0.0000
+Strict-Matched [lambda=0.12969483568075119, results_strict_lam005]  0.7911±0.0039  0.8227±0.0068  0.8276±0.0115  0.0249±0.0037  0.0210±0.0013  0.0207±0.0020  0.0185±0.0012  0.7083±0.0295  3.0000±0.0000  3.4643±0.0000  89.5415±0.1854  2.2171±0.0000
+Strict_lam=0.05                                                     0.7917±0.0034  0.8293±0.0081  0.8352±0.0117  0.0271±0.0083  0.0219±0.0097  0.0231±0.0026  0.0221±0.0016  0.3111±0.1082  3.0000±0.0000  3.4643±0.0000  89.5415±0.1854  2.2171±0.0000
+Strict-Matched [lambda=0.12969483568075119, results_strict_lam025]  0.7890±0.0046  0.8242±0.0072  0.8286±0.0081  0.0212±0.0045  0.0200±0.0070  0.0186±0.0015  0.0177±0.0013  0.6273±0.1318  3.0000±0.0000  3.4643±0.0000  89.5415±0.1854  2.2171±0.0000
+Strict_lam=0.25                                                     0.7898±0.0038  0.8300±0.0055  0.8381±0.0110  0.0242±0.0047  0.0229±0.0047  0.0163±0.0014  0.0148±0.0012  0.6273±0.1318  3.0000±0.0000  3.4643±0.0000  89.5415±0.1854  2.2171±0.0000
+
+Delta vs Baseline
+-----------------
+
+Naive Swap
+  F1           +0.0034 +
+  PairAcc      +0.0139 +
+  S-PairAcc    +0.0095 +
+  Flip         -0.0337 +
+  S-Flip       -0.0314 +
+  ProbGap      -0.0272 +
+  S-ProbGap    -0.0282 +
+  FPRGap       -0.0116 +
+
+Strict-Gated
+  F1           +0.0025 +
+  PairAcc      +0.0190 +
+  S-PairAcc    +0.0171 +
+  Flip         -0.0315 +
+  S-Flip       -0.0324 +
+  ProbGap      -0.0242 +
+  S-ProbGap    -0.0257 +
+  FPRGap       +0.1696 -
+
+Strict-Matched
+  F1           +0.0024 +
+  PairAcc      +0.0234 +
+  S-PairAcc    +0.0219 +
+  Flip         -0.0344 +
+  S-Flip       -0.0343 +
+  ProbGap      -0.0264 +
+  S-ProbGap    -0.0282 +
+  FPRGap       +0.0377 -
+
+Strict_lam=0.15
+  F1           +0.0035 +
+  PairAcc      +0.0220 +
+  S-PairAcc    +0.0229 +
+  Flip         -0.0359 +
+  S-Flip       -0.0362 +
+  ProbGap      -0.0272 +
+  S-ProbGap    -0.0287 +
+  FPRGap       +0.0307 -
+
+Masking Cons Reg
+  F1           +0.0019 +
+  PairAcc      +0.0081 +
+  S-PairAcc    +0.0057 +
+  Flip         -0.0059 +
+  S-Flip       -0.0048 +
+  ProbGap      -0.0005 +
+  S-ProbGap    +0.0004 -
+  FPRGap       -0.0132 +
+
+Strict-Matched [lambda=0.12969483568075119, results_strict_lam005]
+  F1           +0.0029 +
+  PairAcc      +0.0198 +
+  S-PairAcc    +0.0200 +
+  Flip         -0.0300 +
+  S-Flip       -0.0333 +
+  ProbGap      -0.0232 +
+  S-ProbGap    -0.0262 +
+  FPRGap       +0.2298 -
+
+Strict_lam=0.05
+  F1           +0.0035 +
+  PairAcc      +0.0264 +
+  S-PairAcc    +0.0276 +
+  Flip         -0.0278 +
+  S-Flip       -0.0324 +
+  ProbGap      -0.0209 +
+  S-ProbGap    -0.0227 +
+  FPRGap       -0.1674 +
+
+Strict-Matched [lambda=0.12969483568075119, results_strict_lam025]
+  F1           +0.0008 +
+  PairAcc      +0.0212 +
+  S-PairAcc    +0.0210 +
+  Flip         -0.0337 +
+  S-Flip       -0.0343 +
+  ProbGap      -0.0253 +
+  S-ProbGap    -0.0270 +
+  FPRGap       +0.1488 -
+
+Strict_lam=0.25
+  F1           +0.0015 +
+  PairAcc      +0.0271 +
+  S-PairAcc    +0.0305 +
+  Flip         -0.0308 +
+  S-Flip       -0.0314 +
+  ProbGap      -0.0276 +
+  S-ProbGap    -0.0299 +
+  FPRGap       +0.1488 -
+
+Interpretation guardrails
+-------------------------
+- Do not rank methods by flip rate alone; low flip can hide consistently wrong pairs.
+- Prefer Macro-F1 + Strict PairAcc as the main claim when available.
+- TrainCF% explains regularization strength: a stricter gate may lose because it sees fewer CF pairs.
+- FPR Gap has small normal-group support (Baseline=minN 3.0, Naive Swap=minN 3.0, Strict-Gated=minN 3.0, Strict-Matched=minN 3.0, Strict_lam=0.15=minN 3.0, Masking Cons Reg=minN 3.0, Strict-Matched [lambda=0.12969483568075119, results_strict_lam005]=minN 3.0, Strict_lam=0.05=minN 3.0, Strict-Matched [lambda=0.12969483568075119, results_strict_lam025]=minN 3.0, Strict_lam=0.25=minN 3.0); keep FPR Gap as a secondary metric.
+- Strict-Gated beats or matches Naive on Strict PairAcc: this supports the validity-gated claim.
+
+Paper-claim suggestion
+----------------------
+Use the strong claim: validity-gated CCR improves or matches Naive while preserving F1.
+TrainCF coverage: Naive=4.49% vs Strict=3.46%.
+Regularized batches: Naive=94.82% vs Strict=89.54%.
+Valid CF per batch: Naive=2.88 vs Strict=2.22.
+
+Coverage-matched diagnostic
+---------------------------
+Strict lambda=0.1 vs Strict-Matched lambda=0.12969483568075119.
+- Strict-Matched improves Strict PairAcc: Strict-Gated was likely under-regularized by lower CF coverage.
+
+Best strict-family variant
+--------------------------
+Strict_lam=0.25: Strict PairAcc=0.8381, F1=0.7898, Strict ProbGap=0.0148
+- Use this as the main gated result: it matches/beats Naive on Strict PairAcc while preserving F1.
+- It also improves Strict ProbGap over Naive, useful as a soft-consistency argument.
+
+Naive vs best gated paired diagnostic
+-------------------------------------
+Best gated row: Strict_lam=0.25
+- Strict PairAcc: gated-naive mean delta=+0.0210; gated is higher on 3/3 matched seeds.
+- Macro-F1: gated-naive mean delta=-0.0019; gated is higher on 1/3 matched seeds.
+- Strict ProbGap: gated-naive mean delta=-0.0017; gated is lower on 2/3 matched seeds.
+
+Claim assessment
+----------------
+Level: strong_gated
+Main method: Strict_lam=0.25
+Headline: Validity-gated CCR is the main result.
+- Best gated row: Strict_lam=0.25.
+- Macro-F1: 0.7898 vs reference 0.7882 (tolerance 0.01).
+- Strict PairAcc: gated 0.8381 vs Naive 0.8171.
+- Strict ProbGap: gated 0.0148 vs Naive 0.0165.
+Report action: Use the best gated row as the primary method: it preserves Macro-F1 and matches or beats Naive on Strict PairAcc.
+
+Recommended next steps
+----------------------
+- Freeze the method search and move to error analysis/report writing; the gated result is strong enough.
+
+Report readiness audit
+----------------------
+FAIL: Loaded result files mix different git_commit values: ['57380c4', 'abebc67'].
+FAIL: Some result files were produced from dirty git state: ['results/raw/results_masking.json', 'results/raw/results_strict_lam025.json'].
+WARN: Some result files are incremental checkpoints, not final saves: ['results/raw/results_core_followup.json'].
+WARN: Baseline has low FPR support (FPR minN=3.0); keep FPR Gap secondary.
+WARN: Naive Swap has low FPR support (FPR minN=3.0); keep FPR Gap secondary.
+WARN: Strict-Gated has low FPR support (FPR minN=3.0); keep FPR Gap secondary.
+PASS: All loaded result files have _meta.
+PASS: Core methods are present: Baseline, Naive Swap, Strict-Gated.
+PASS: Core methods have at least 3 seeds.
+PASS: Best gated vs Naive has matched seed diagnostics (3 seed(s)).
+
+Saved qualitative examples
+--------------------------
+Counts are capped saved examples, not total error counts.
+Experiment                                                          flip      strict_flip  both_wrong  strict_both_wrong  false_positive_original  false_positive_cf
+------------------------------------------------------------------  --------  -----------  ----------  -----------------  -----------------------  -----------------
+Baseline                                                                  15           15          15                 15                       15                 15
+Naive Swap                                                                15           15          15                 15                       15                 15
+Strict-Gated                                                              15           13          15                 15                       15                 15
+Strict-Matched                                                            15           13          15                 15                       15                 15
+Strict_lam=0.15                                                           15           15          15                 15                       15                 15
+Masking Cons Reg                                                          15           15          15                 15                       15                 15
+Strict-Matched [lambda=0.12969483568075119, results_strict_lam005]        15           15          15                 15                       15                 15
+Strict_lam=0.05                                                           15           13          15                 15                       15                 15
+Strict-Matched [lambda=0.12969483568075119, results_strict_lam025]        15           14          15                 15                       15                 15
+Strict_lam=0.25                                                           15           15          15                 15                       15                 15
+
+Qualitative error examples
+--------------------------
+
+[strict_flip]
+- Baseline seed=42 label=1 pred=0 cf_pred=1 prob=0.3479 cf_prob=0.59 gap=0.2421 cat=gender terms=여성->남성 strict=True
+  orig: 여가부.여성단체. 왈왈왈 #@이름# 미워할거양~~~ㅠㅠ
+  cf  : 여가부.남성단체. 왈왈왈 #@이름# 미워할거양~~~ㅠㅠ
+- Baseline seed=42 label=1 pred=1 cf_pred=0 prob=0.6908 cf_prob=0.3401 gap=0.3508 cat=age terms=노인->청년 strict=True
+  orig: 당대표인 #@이름#과 상의하는것이 맞다,,,국민의힘은 #@이름#이 결정하는데로 뒷밧침하면 정권탈환이 가능하다..전략과 전술이 박약한 강성보수유튜브에 휘둘리어...
+  cf  : 당대표인 #@이름#과 상의하는것이 맞다,,,국민의힘은 #@이름#이 결정하는데로 뒷밧침하면 정권탈환이 가능하다..전략과 전술이 박약한 강성보수유튜브에 휘둘리어...
+- Baseline seed=42 label=0 pred=1 cf_pred=0 prob=0.6594 cf_prob=0.2044 gap=0.455 cat=sexuality terms=동성애자->이성애자 strict=True
+  orig: 동성애자 잘만나면 2대1로 할수있다ㅋㅋ
+  cf  : 이성애자 잘만나면 2대1로 할수있다ㅋㅋ
+- Naive Swap seed=42 label=1 pred=0 cf_pred=1 prob=0.4978 cf_prob=0.6136 gap=0.1157 cat=gender terms=여성->남성 strict=True
+  orig: 여가부.여성단체. 왈왈왈 #@이름# 미워할거양~~~ㅠㅠ
+  cf  : 여가부.남성단체. 왈왈왈 #@이름# 미워할거양~~~ㅠㅠ
+- Naive Swap seed=42 label=1 pred=1 cf_pred=0 prob=0.5725 cf_prob=0.4666 gap=0.1059 cat=age terms=노인->청년 strict=True
+  orig: 당대표인 #@이름#과 상의하는것이 맞다,,,국민의힘은 #@이름#이 결정하는데로 뒷밧침하면 정권탈환이 가능하다..전략과 전술이 박약한 강성보수유튜브에 휘둘리어...
+  cf  : 당대표인 #@이름#과 상의하는것이 맞다,,,국민의힘은 #@이름#이 결정하는데로 뒷밧침하면 정권탈환이 가능하다..전략과 전술이 박약한 강성보수유튜브에 휘둘리어...
+- Naive Swap seed=42 label=1 pred=1 cf_pred=0 prob=0.5941 cf_prob=0.4992 gap=0.0949 cat=age terms=노인->청년 strict=True
+  orig: 노인들성폭행하는 인간은 도대체 어떤인간이냐 아니 인간이 아니니 저런짓을하지 성범죄자들은 거세시켜야한다
+  cf  : 청년들성폭행하는 인간은 도대체 어떤인간이냐 아니 인간이 아니니 저런짓을하지 성범죄자들은 거세시켜야한다
+- Strict-Gated seed=42 label=0 pred=1 cf_pred=0 prob=0.5894 cf_prob=0.4467 gap=0.1427 cat=sexuality terms=동성애자->이성애자 strict=True
+  orig: 동성애자 잘만나면 2대1로 할수있다ㅋㅋ
+  cf  : 이성애자 잘만나면 2대1로 할수있다ㅋㅋ
+- Strict-Gated seed=42 label=1 pred=1 cf_pred=0 prob=0.5016 cf_prob=0.4905 gap=0.0111 cat=gender terms=여자->남자 strict=True
+  orig: 하룻밤에 1억 준다고 하면 한국 여자들 줄서서 기다릴텐데
+  cf  : 하룻밤에 1억 준다고 하면 한국 남자들 줄서서 기다릴텐데
+- Strict-Gated seed=42 label=0 pred=0 cf_pred=1 prob=0.4238 cf_prob=0.5364 gap=0.1126 cat=gender terms=여자->남자 strict=True
+  orig: #@이름#란 뭐하는 여잔지
+  cf  : #@이름#란 뭐하는 남자지
+- Strict-Matched seed=42 label=0 pred=1 cf_pred=0 prob=0.5001 cf_prob=0.4987 gap=0.0014 cat=gender terms=여성->남성 strict=True
+  orig: 미군철수하면 ~~ 청와대에 몇명이나 남을까 ~~ 우리나라 여성장관도 남는다 일까 ~~ 아니야 아니야 그것은 거짓말 ~~ 차라리 조국을 믿지.
+  cf  : 미군철수하면 ~~ 청와대에 몇명이나 남을까 ~~ 우리나라 남성장관도 남는다 일까 ~~ 아니야 아니야 그것은 거짓말 ~~ 차라리 조국을 믿지.
+- Strict-Matched seed=42 label=0 pred=1 cf_pred=0 prob=0.5005 cf_prob=0.4982 gap=0.0023 cat=gender terms=여자->남자 strict=True
+  orig: 제목보고 죽은여자가 피살된 #@이름# 인줄 알았네
+  cf  : 제목보고 죽은남자가 피살된 #@이름# 인줄 알았네
+- Strict-Matched seed=42 label=0 pred=1 cf_pred=0 prob=0.5492 cf_prob=0.4437 gap=0.1055 cat=sexuality terms=동성애자->이성애자 strict=True
+  orig: 동성애자 잘만나면 2대1로 할수있다ㅋㅋ
+  cf  : 이성애자 잘만나면 2대1로 할수있다ㅋㅋ
+- Strict_lam=0.15 seed=42 label=0 pred=1 cf_pred=0 prob=0.5674 cf_prob=0.4542 gap=0.1132 cat=sexuality terms=동성애자->이성애자 strict=True
+  orig: 동성애자 잘만나면 2대1로 할수있다ㅋㅋ
+  cf  : 이성애자 잘만나면 2대1로 할수있다ㅋㅋ
+- Strict_lam=0.15 seed=42 label=1 pred=1 cf_pred=0 prob=0.5003 cf_prob=0.4831 gap=0.0172 cat=gender terms=여자->남자 strict=True
+  orig: 하룻밤에 1억 준다고 하면 한국 여자들 줄서서 기다릴텐데
+  cf  : 하룻밤에 1억 준다고 하면 한국 남자들 줄서서 기다릴텐데
+- Strict_lam=0.15 seed=42 label=1 pred=0 cf_pred=1 prob=0.4987 cf_prob=0.5188 gap=0.0201 cat=age terms=노인->청년 strict=True
+  orig: 노인들성폭행하는 인간은 도대체 어떤인간이냐 아니 인간이 아니니 저런짓을하지 성범죄자들은 거세시켜야한다
+  cf  : 청년들성폭행하는 인간은 도대체 어떤인간이냐 아니 인간이 아니니 저런짓을하지 성범죄자들은 거세시켜야한다
+- Masking Cons Reg seed=42 label=0 pred=1 cf_pred=0 prob=0.5654 cf_prob=0.3545 gap=0.2108 cat=gender terms=여자->남자 strict=True
+  orig: 제목보고 죽은여자가 피살된 #@이름# 인줄 알았네
+  cf  : 제목보고 죽은남자가 피살된 #@이름# 인줄 알았네
+- Masking Cons Reg seed=42 label=0 pred=1 cf_pred=0 prob=0.6584 cf_prob=0.3618 gap=0.2966 cat=sexuality terms=동성애자->이성애자 strict=True
+  orig: 동성애자 잘만나면 2대1로 할수있다ㅋㅋ
+  cf  : 이성애자 잘만나면 2대1로 할수있다ㅋㅋ
+- Masking Cons Reg seed=42 label=1 pred=0 cf_pred=1 prob=0.338 cf_prob=0.8188 gap=0.4809 cat=gender terms=페미->한남 strict=True
+  orig: 감성까지 가르는 페미! 각성하라. 도대체 어디까지가 양성 평등인가.', 이런 일련의 문제들은 정치인들의 알량한 한표로 인한 몰인간적인 행위에서 파생된 발상들이다.
+  cf  : 감성까지 가르는 한남! 각성하라. 도대체 어디까지가 양성 평등인가.', 이런 일련의 문제들은 정치인들의 알량한 한표로 인한 몰인간적인 행위에서 파생된 발상들이다.
+- Strict-Matched [lambda=0.12969483568075119, results_strict_lam005] seed=42 label=0 pred=1 cf_pred=0 prob=0.5132 cf_prob=0.4921 gap=0.0211 cat=gender terms=여자->남자 strict=True
+  orig: 나도 급똥땜에 정신없이 들어간곳이 여자화장실..정신이 혼미해지더라. 급똥일때는 그럴수있다고 생각한다. 급똥 당해본 사람들은 알거다 아무 생각이 음따
+  cf  : 나도 급똥땜에 정신없이 들어간곳이 남자화장실..정신이 혼미해지더라. 급똥일때는 그럴수있다고 생각한다. 급똥 당해본 사람들은 알거다 아무 생각이 음따
+- Strict-Matched [lambda=0.12969483568075119, results_strict_lam005] seed=42 label=0 pred=1 cf_pred=0 prob=0.587 cf_prob=0.4265 gap=0.1605 cat=sexuality terms=동성애자->이성애자 strict=True
+  orig: 동성애자 잘만나면 2대1로 할수있다ㅋㅋ
+  cf  : 이성애자 잘만나면 2대1로 할수있다ㅋㅋ
+- Strict-Matched [lambda=0.12969483568075119, results_strict_lam005] seed=42 label=1 pred=1 cf_pred=0 prob=0.5212 cf_prob=0.4794 gap=0.0418 cat=gender terms=여자->남자 strict=True
+  orig: 하룻밤에 1억 준다고 하면 한국 여자들 줄서서 기다릴텐데
+  cf  : 하룻밤에 1억 준다고 하면 한국 남자들 줄서서 기다릴텐데
+- Strict_lam=0.05 seed=42 label=1 pred=0 cf_pred=1 prob=0.4679 cf_prob=0.5516 gap=0.0837 cat=gender terms=여성->남성 strict=True
+  orig: 여가부.여성단체. 왈왈왈 #@이름# 미워할거양~~~ㅠㅠ
+  cf  : 여가부.남성단체. 왈왈왈 #@이름# 미워할거양~~~ㅠㅠ
+- Strict_lam=0.05 seed=42 label=0 pred=1 cf_pred=0 prob=0.5983 cf_prob=0.4887 gap=0.1096 cat=gender terms=페미니스트->남성우월주의자 strict=True
+  orig: 며느리들이 명예훼손하지 말라고 하는데, 왜 네티즌들은 페미니스트마냥 고양이엄마들 마냥 남의 집안사에 이렇게 감정이입을 해서 본인 주관을 객관화 시켜서 불우하...
+  cf  : 며느리들이 명예훼손하지 말라고 하는데, 왜 네티즌들은 남성우월주의자마냥 고양이엄마들 마냥 남의 집안사에 이렇게 감정이입을 해서 본인 주관을 객관화 시켜서 불...
+- Strict_lam=0.05 seed=42 label=1 pred=0 cf_pred=1 prob=0.4946 cf_prob=0.5518 gap=0.0572 cat=ethnicity terms=일본인->한국인 strict=True
+  orig: 참고로 일본인이 가장 싫어하는 나라 *위가 중국임. 뭐라고 해야 하나? 피장파장? 용호상박?
+  cf  : 참고로 한국인이 가장 싫어하는 나라 *위가 중국임. 뭐라고 해야 하나? 피장파장? 용호상박?
+- Strict-Matched [lambda=0.12969483568075119, results_strict_lam025] seed=42 label=0 pred=1 cf_pred=0 prob=0.6194 cf_prob=0.4593 gap=0.1601 cat=sexuality terms=동성애자->이성애자 strict=True
+  orig: 동성애자 잘만나면 2대1로 할수있다ㅋㅋ
+  cf  : 이성애자 잘만나면 2대1로 할수있다ㅋㅋ
+- Strict-Matched [lambda=0.12969483568075119, results_strict_lam025] seed=42 label=0 pred=0 cf_pred=1 prob=0.4645 cf_prob=0.5573 gap=0.0928 cat=gender terms=여자->남자 strict=True
+  orig: #@이름#란 뭐하는 여잔지
+  cf  : #@이름#란 뭐하는 남자지
+- Strict-Matched [lambda=0.12969483568075119, results_strict_lam025] seed=42 label=0 pred=1 cf_pred=0 prob=0.5688 cf_prob=0.406 gap=0.1629 cat=gender terms=여자->남자 strict=True
+  orig: 대국의 여자답네
+  cf  : 대국의 남자답네
+- Strict_lam=0.25 seed=42 label=0 pred=1 cf_pred=0 prob=0.5638 cf_prob=0.4802 gap=0.0837 cat=sexuality terms=동성애자->이성애자 strict=True
+  orig: 동성애자 잘만나면 2대1로 할수있다ㅋㅋ
+  cf  : 이성애자 잘만나면 2대1로 할수있다ㅋㅋ
+- Strict_lam=0.25 seed=42 label=0 pred=0 cf_pred=1 prob=0.4343 cf_prob=0.5689 gap=0.1346 cat=gender terms=여자->남자 strict=True
+  orig: #@이름#란 뭐하는 여잔지
+  cf  : #@이름#란 뭐하는 남자지
+- Strict_lam=0.25 seed=42 label=0 pred=1 cf_pred=0 prob=0.5395 cf_prob=0.4582 gap=0.0813 cat=gender terms=여자->남자 strict=True
+  orig: 대국의 여자답네
+  cf  : 대국의 남자답네
+
+[both_wrong]
+- Baseline seed=42 label=0 pred=1 cf_pred=1 prob=0.8848 cf_prob=0.9215 gap=0.0367 cat=gender terms=페미->한남 strict=True
+  orig: 아줌마, 숏컷으로 물타기 그만 하세요, 남자 운동선수,연예인들이 과거 남초 커뮤니티에서 유행하던 용어들 sns에 올렸다가 , 페미들에게 집중포화맞고 사과하거...
+  cf  : 아줌마, 숏컷으로 물타기 그만 하세요, 남자 운동선수,연예인들이 과거 남초 커뮤니티에서 유행하던 용어들 sns에 올렸다가 , 한남들에게 집중포화맞고 사과하거...
+- Baseline seed=42 label=0 pred=1 cf_pred=1 prob=0.8621 cf_prob=0.8912 gap=0.0291 cat=age terms=할머니->젊은여자 strict=False
+  orig: 진짜 작작해라 할머니들 팔아서 천년만년 그짓꺼리 해먹고 살려냐? 천벌받는다
+  cf  : 진짜 작작해라 젊은여자들 팔아서 천년만년 그짓꺼리 해먹고 살려냐? 천벌받는다
+- Baseline seed=42 label=0 pred=1 cf_pred=1 prob=0.8668 cf_prob=0.8602 gap=0.0066 cat=religion terms=이슬람->기독교 strict=True
+  orig: 중국이 이슬람을 모르네..너희 실수한거야..돈 날린거라고..
+  cf  : 중국이 기독교를 모르네..너희 실수한거야..돈 날린거라고..
+- Naive Swap seed=42 label=0 pred=1 cf_pred=1 prob=0.7306 cf_prob=0.7477 gap=0.0171 cat=gender terms=페미->한남 strict=True
+  orig: 아줌마, 숏컷으로 물타기 그만 하세요, 남자 운동선수,연예인들이 과거 남초 커뮤니티에서 유행하던 용어들 sns에 올렸다가 , 페미들에게 집중포화맞고 사과하거...
+  cf  : 아줌마, 숏컷으로 물타기 그만 하세요, 남자 운동선수,연예인들이 과거 남초 커뮤니티에서 유행하던 용어들 sns에 올렸다가 , 한남들에게 집중포화맞고 사과하거...
+- Naive Swap seed=42 label=0 pred=1 cf_pred=1 prob=0.5598 cf_prob=0.5551 gap=0.0047 cat=gender terms=여성->남성 strict=True
+  orig: 미군철수하면 ~~ 청와대에 몇명이나 남을까 ~~ 우리나라 여성장관도 남는다 일까 ~~ 아니야 아니야 그것은 거짓말 ~~ 차라리 조국을 믿지.
+  cf  : 미군철수하면 ~~ 청와대에 몇명이나 남을까 ~~ 우리나라 남성장관도 남는다 일까 ~~ 아니야 아니야 그것은 거짓말 ~~ 차라리 조국을 믿지.
+- Naive Swap seed=42 label=0 pred=1 cf_pred=1 prob=0.8225 cf_prob=0.8206 gap=0.0019 cat=age terms=할머니->젊은여자 strict=False
+  orig: 진짜 작작해라 할머니들 팔아서 천년만년 그짓꺼리 해먹고 살려냐? 천벌받는다
+  cf  : 진짜 작작해라 젊은여자들 팔아서 천년만년 그짓꺼리 해먹고 살려냐? 천벌받는다
+- Strict-Gated seed=42 label=0 pred=1 cf_pred=1 prob=0.7442 cf_prob=0.7538 gap=0.0096 cat=gender terms=페미->한남 strict=True
+  orig: 아줌마, 숏컷으로 물타기 그만 하세요, 남자 운동선수,연예인들이 과거 남초 커뮤니티에서 유행하던 용어들 sns에 올렸다가 , 페미들에게 집중포화맞고 사과하거...
+  cf  : 아줌마, 숏컷으로 물타기 그만 하세요, 남자 운동선수,연예인들이 과거 남초 커뮤니티에서 유행하던 용어들 sns에 올렸다가 , 한남들에게 집중포화맞고 사과하거...
+- Strict-Gated seed=42 label=0 pred=1 cf_pred=1 prob=0.8318 cf_prob=0.8154 gap=0.0163 cat=age terms=할머니->젊은여자 strict=False
+  orig: 진짜 작작해라 할머니들 팔아서 천년만년 그짓꺼리 해먹고 살려냐? 천벌받는다
+  cf  : 진짜 작작해라 젊은여자들 팔아서 천년만년 그짓꺼리 해먹고 살려냐? 천벌받는다
+- Strict-Gated seed=42 label=0 pred=1 cf_pred=1 prob=0.8527 cf_prob=0.852 gap=0.0007 cat=religion terms=이슬람->기독교 strict=True
+  orig: 중국이 이슬람을 모르네..너희 실수한거야..돈 날린거라고..
+  cf  : 중국이 기독교를 모르네..너희 실수한거야..돈 날린거라고..
+- Strict-Matched seed=42 label=0 pred=1 cf_pred=1 prob=0.696 cf_prob=0.6967 gap=0.0008 cat=gender terms=페미->한남 strict=True
+  orig: 아줌마, 숏컷으로 물타기 그만 하세요, 남자 운동선수,연예인들이 과거 남초 커뮤니티에서 유행하던 용어들 sns에 올렸다가 , 페미들에게 집중포화맞고 사과하거...
+  cf  : 아줌마, 숏컷으로 물타기 그만 하세요, 남자 운동선수,연예인들이 과거 남초 커뮤니티에서 유행하던 용어들 sns에 올렸다가 , 한남들에게 집중포화맞고 사과하거...
+- Strict-Matched seed=42 label=0 pred=1 cf_pred=1 prob=0.8381 cf_prob=0.834 gap=0.004 cat=age terms=할머니->젊은여자 strict=False
+  orig: 진짜 작작해라 할머니들 팔아서 천년만년 그짓꺼리 해먹고 살려냐? 천벌받는다
+  cf  : 진짜 작작해라 젊은여자들 팔아서 천년만년 그짓꺼리 해먹고 살려냐? 천벌받는다
+- Strict-Matched seed=42 label=0 pred=1 cf_pred=1 prob=0.8678 cf_prob=0.8587 gap=0.009 cat=religion terms=이슬람->기독교 strict=True
+  orig: 중국이 이슬람을 모르네..너희 실수한거야..돈 날린거라고..
+  cf  : 중국이 기독교를 모르네..너희 실수한거야..돈 날린거라고..
+- Strict_lam=0.15 seed=42 label=0 pred=1 cf_pred=1 prob=0.7022 cf_prob=0.7081 gap=0.0058 cat=gender terms=페미->한남 strict=True
+  orig: 아줌마, 숏컷으로 물타기 그만 하세요, 남자 운동선수,연예인들이 과거 남초 커뮤니티에서 유행하던 용어들 sns에 올렸다가 , 페미들에게 집중포화맞고 사과하거...
+  cf  : 아줌마, 숏컷으로 물타기 그만 하세요, 남자 운동선수,연예인들이 과거 남초 커뮤니티에서 유행하던 용어들 sns에 올렸다가 , 한남들에게 집중포화맞고 사과하거...
+- Strict_lam=0.15 seed=42 label=0 pred=1 cf_pred=1 prob=0.8274 cf_prob=0.827 gap=0.0004 cat=age terms=할머니->젊은여자 strict=False
+  orig: 진짜 작작해라 할머니들 팔아서 천년만년 그짓꺼리 해먹고 살려냐? 천벌받는다
+  cf  : 진짜 작작해라 젊은여자들 팔아서 천년만년 그짓꺼리 해먹고 살려냐? 천벌받는다
+- Strict_lam=0.15 seed=42 label=0 pred=1 cf_pred=1 prob=0.8776 cf_prob=0.87 gap=0.0075 cat=religion terms=이슬람->기독교 strict=True
+  orig: 중국이 이슬람을 모르네..너희 실수한거야..돈 날린거라고..
+  cf  : 중국이 기독교를 모르네..너희 실수한거야..돈 날린거라고..
+- Masking Cons Reg seed=42 label=0 pred=1 cf_pred=1 prob=0.7338 cf_prob=0.7787 gap=0.0449 cat=gender terms=페미->한남 strict=True
+  orig: 아줌마, 숏컷으로 물타기 그만 하세요, 남자 운동선수,연예인들이 과거 남초 커뮤니티에서 유행하던 용어들 sns에 올렸다가 , 페미들에게 집중포화맞고 사과하거...
+  cf  : 아줌마, 숏컷으로 물타기 그만 하세요, 남자 운동선수,연예인들이 과거 남초 커뮤니티에서 유행하던 용어들 sns에 올렸다가 , 한남들에게 집중포화맞고 사과하거...
+- Masking Cons Reg seed=42 label=0 pred=1 cf_pred=1 prob=0.6399 cf_prob=0.6229 gap=0.017 cat=gender terms=여성->남성 strict=True
+  orig: 미군철수하면 ~~ 청와대에 몇명이나 남을까 ~~ 우리나라 여성장관도 남는다 일까 ~~ 아니야 아니야 그것은 거짓말 ~~ 차라리 조국을 믿지.
+  cf  : 미군철수하면 ~~ 청와대에 몇명이나 남을까 ~~ 우리나라 남성장관도 남는다 일까 ~~ 아니야 아니야 그것은 거짓말 ~~ 차라리 조국을 믿지.
+- Masking Cons Reg seed=42 label=0 pred=1 cf_pred=1 prob=0.9578 cf_prob=0.928 gap=0.0298 cat=age terms=할머니->젊은여자 strict=False
+  orig: 진짜 작작해라 할머니들 팔아서 천년만년 그짓꺼리 해먹고 살려냐? 천벌받는다
+  cf  : 진짜 작작해라 젊은여자들 팔아서 천년만년 그짓꺼리 해먹고 살려냐? 천벌받는다
+- Strict-Matched [lambda=0.12969483568075119, results_strict_lam005] seed=42 label=0 pred=1 cf_pred=1 prob=0.6332 cf_prob=0.6409 gap=0.0077 cat=gender terms=페미->한남 strict=True
+  orig: 아줌마, 숏컷으로 물타기 그만 하세요, 남자 운동선수,연예인들이 과거 남초 커뮤니티에서 유행하던 용어들 sns에 올렸다가 , 페미들에게 집중포화맞고 사과하거...
+  cf  : 아줌마, 숏컷으로 물타기 그만 하세요, 남자 운동선수,연예인들이 과거 남초 커뮤니티에서 유행하던 용어들 sns에 올렸다가 , 한남들에게 집중포화맞고 사과하거...
+- Strict-Matched [lambda=0.12969483568075119, results_strict_lam005] seed=42 label=0 pred=1 cf_pred=1 prob=0.8502 cf_prob=0.8814 gap=0.0311 cat=age terms=할머니->젊은여자 strict=False
+  orig: 진짜 작작해라 할머니들 팔아서 천년만년 그짓꺼리 해먹고 살려냐? 천벌받는다
+  cf  : 진짜 작작해라 젊은여자들 팔아서 천년만년 그짓꺼리 해먹고 살려냐? 천벌받는다
+- Strict-Matched [lambda=0.12969483568075119, results_strict_lam005] seed=42 label=0 pred=1 cf_pred=1 prob=0.7594 cf_prob=0.7548 gap=0.0045 cat=religion terms=이슬람->기독교 strict=True
+  orig: 중국이 이슬람을 모르네..너희 실수한거야..돈 날린거라고..
+  cf  : 중국이 기독교를 모르네..너희 실수한거야..돈 날린거라고..
+- Strict_lam=0.05 seed=42 label=0 pred=1 cf_pred=1 prob=0.73 cf_prob=0.7262 gap=0.0039 cat=gender terms=페미->한남 strict=True
+  orig: 아줌마, 숏컷으로 물타기 그만 하세요, 남자 운동선수,연예인들이 과거 남초 커뮤니티에서 유행하던 용어들 sns에 올렸다가 , 페미들에게 집중포화맞고 사과하거...
+  cf  : 아줌마, 숏컷으로 물타기 그만 하세요, 남자 운동선수,연예인들이 과거 남초 커뮤니티에서 유행하던 용어들 sns에 올렸다가 , 한남들에게 집중포화맞고 사과하거...
+- Strict_lam=0.05 seed=42 label=0 pred=1 cf_pred=1 prob=0.5867 cf_prob=0.5946 gap=0.0079 cat=gender terms=여성->남성 strict=True
+  orig: 미군철수하면 ~~ 청와대에 몇명이나 남을까 ~~ 우리나라 여성장관도 남는다 일까 ~~ 아니야 아니야 그것은 거짓말 ~~ 차라리 조국을 믿지.
+  cf  : 미군철수하면 ~~ 청와대에 몇명이나 남을까 ~~ 우리나라 남성장관도 남는다 일까 ~~ 아니야 아니야 그것은 거짓말 ~~ 차라리 조국을 믿지.
+- Strict_lam=0.05 seed=42 label=0 pred=1 cf_pred=1 prob=0.8351 cf_prob=0.8375 gap=0.0024 cat=age terms=할머니->젊은여자 strict=False
+  orig: 진짜 작작해라 할머니들 팔아서 천년만년 그짓꺼리 해먹고 살려냐? 천벌받는다
+  cf  : 진짜 작작해라 젊은여자들 팔아서 천년만년 그짓꺼리 해먹고 살려냐? 천벌받는다
+- Strict-Matched [lambda=0.12969483568075119, results_strict_lam025] seed=42 label=0 pred=1 cf_pred=1 prob=0.655 cf_prob=0.6642 gap=0.0092 cat=gender terms=페미->한남 strict=True
+  orig: 아줌마, 숏컷으로 물타기 그만 하세요, 남자 운동선수,연예인들이 과거 남초 커뮤니티에서 유행하던 용어들 sns에 올렸다가 , 페미들에게 집중포화맞고 사과하거...
+  cf  : 아줌마, 숏컷으로 물타기 그만 하세요, 남자 운동선수,연예인들이 과거 남초 커뮤니티에서 유행하던 용어들 sns에 올렸다가 , 한남들에게 집중포화맞고 사과하거...
+- Strict-Matched [lambda=0.12969483568075119, results_strict_lam025] seed=42 label=0 pred=1 cf_pred=1 prob=0.5422 cf_prob=0.5416 gap=0.0006 cat=gender terms=여성->남성 strict=True
+  orig: 미군철수하면 ~~ 청와대에 몇명이나 남을까 ~~ 우리나라 여성장관도 남는다 일까 ~~ 아니야 아니야 그것은 거짓말 ~~ 차라리 조국을 믿지.
+  cf  : 미군철수하면 ~~ 청와대에 몇명이나 남을까 ~~ 우리나라 남성장관도 남는다 일까 ~~ 아니야 아니야 그것은 거짓말 ~~ 차라리 조국을 믿지.
+- Strict-Matched [lambda=0.12969483568075119, results_strict_lam025] seed=42 label=0 pred=1 cf_pred=1 prob=0.8301 cf_prob=0.7935 gap=0.0365 cat=age terms=할머니->젊은여자 strict=False
+  orig: 진짜 작작해라 할머니들 팔아서 천년만년 그짓꺼리 해먹고 살려냐? 천벌받는다
+  cf  : 진짜 작작해라 젊은여자들 팔아서 천년만년 그짓꺼리 해먹고 살려냐? 천벌받는다
+- Strict_lam=0.25 seed=42 label=0 pred=1 cf_pred=1 prob=0.7351 cf_prob=0.7384 gap=0.0033 cat=gender terms=페미->한남 strict=True
+  orig: 아줌마, 숏컷으로 물타기 그만 하세요, 남자 운동선수,연예인들이 과거 남초 커뮤니티에서 유행하던 용어들 sns에 올렸다가 , 페미들에게 집중포화맞고 사과하거...
+  cf  : 아줌마, 숏컷으로 물타기 그만 하세요, 남자 운동선수,연예인들이 과거 남초 커뮤니티에서 유행하던 용어들 sns에 올렸다가 , 한남들에게 집중포화맞고 사과하거...
+- Strict_lam=0.25 seed=42 label=0 pred=1 cf_pred=1 prob=0.8241 cf_prob=0.825 gap=0.001 cat=age terms=할머니->젊은여자 strict=False
+  orig: 진짜 작작해라 할머니들 팔아서 천년만년 그짓꺼리 해먹고 살려냐? 천벌받는다
+  cf  : 진짜 작작해라 젊은여자들 팔아서 천년만년 그짓꺼리 해먹고 살려냐? 천벌받는다
+- Strict_lam=0.25 seed=42 label=0 pred=1 cf_pred=1 prob=0.8696 cf_prob=0.8562 gap=0.0134 cat=religion terms=이슬람->기독교 strict=True
+  orig: 중국이 이슬람을 모르네..너희 실수한거야..돈 날린거라고..
+  cf  : 중국이 기독교를 모르네..너희 실수한거야..돈 날린거라고..
+
+[false_positive_original]
+- Baseline seed=42 label=0 pred=1 cf_pred=1 prob=0.8848 cf_prob=0.9215 gap=0.0367 cat=gender terms=페미->한남 strict=True
+  orig: 아줌마, 숏컷으로 물타기 그만 하세요, 남자 운동선수,연예인들이 과거 남초 커뮤니티에서 유행하던 용어들 sns에 올렸다가 , 페미들에게 집중포화맞고 사과하거...
+  cf  : 아줌마, 숏컷으로 물타기 그만 하세요, 남자 운동선수,연예인들이 과거 남초 커뮤니티에서 유행하던 용어들 sns에 올렸다가 , 한남들에게 집중포화맞고 사과하거...
+- Baseline seed=42 label=0 pred=1 cf_pred=1 prob=0.8621 cf_prob=0.8912 gap=0.0291 cat=age terms=할머니->젊은여자 strict=False
+  orig: 진짜 작작해라 할머니들 팔아서 천년만년 그짓꺼리 해먹고 살려냐? 천벌받는다
+  cf  : 진짜 작작해라 젊은여자들 팔아서 천년만년 그짓꺼리 해먹고 살려냐? 천벌받는다
+- Baseline seed=42 label=0 pred=1 cf_pred=1 prob=0.8668 cf_prob=0.8602 gap=0.0066 cat=religion terms=이슬람->기독교 strict=True
+  orig: 중국이 이슬람을 모르네..너희 실수한거야..돈 날린거라고..
+  cf  : 중국이 기독교를 모르네..너희 실수한거야..돈 날린거라고..
+- Naive Swap seed=42 label=0 pred=1 cf_pred=1 prob=0.7306 cf_prob=0.7477 gap=0.0171 cat=gender terms=페미->한남 strict=True
+  orig: 아줌마, 숏컷으로 물타기 그만 하세요, 남자 운동선수,연예인들이 과거 남초 커뮤니티에서 유행하던 용어들 sns에 올렸다가 , 페미들에게 집중포화맞고 사과하거...
+  cf  : 아줌마, 숏컷으로 물타기 그만 하세요, 남자 운동선수,연예인들이 과거 남초 커뮤니티에서 유행하던 용어들 sns에 올렸다가 , 한남들에게 집중포화맞고 사과하거...
+- Naive Swap seed=42 label=0 pred=1 cf_pred=1 prob=0.5598 cf_prob=0.5551 gap=0.0047 cat=gender terms=여성->남성 strict=True
+  orig: 미군철수하면 ~~ 청와대에 몇명이나 남을까 ~~ 우리나라 여성장관도 남는다 일까 ~~ 아니야 아니야 그것은 거짓말 ~~ 차라리 조국을 믿지.
+  cf  : 미군철수하면 ~~ 청와대에 몇명이나 남을까 ~~ 우리나라 남성장관도 남는다 일까 ~~ 아니야 아니야 그것은 거짓말 ~~ 차라리 조국을 믿지.
+- Naive Swap seed=42 label=0 pred=1 cf_pred=1 prob=0.8225 cf_prob=0.8206 gap=0.0019 cat=age terms=할머니->젊은여자 strict=False
+  orig: 진짜 작작해라 할머니들 팔아서 천년만년 그짓꺼리 해먹고 살려냐? 천벌받는다
+  cf  : 진짜 작작해라 젊은여자들 팔아서 천년만년 그짓꺼리 해먹고 살려냐? 천벌받는다
+- Strict-Gated seed=42 label=0 pred=1 cf_pred=1 prob=0.7442 cf_prob=0.7538 gap=0.0096 cat=gender terms=페미->한남 strict=True
+  orig: 아줌마, 숏컷으로 물타기 그만 하세요, 남자 운동선수,연예인들이 과거 남초 커뮤니티에서 유행하던 용어들 sns에 올렸다가 , 페미들에게 집중포화맞고 사과하거...
+  cf  : 아줌마, 숏컷으로 물타기 그만 하세요, 남자 운동선수,연예인들이 과거 남초 커뮤니티에서 유행하던 용어들 sns에 올렸다가 , 한남들에게 집중포화맞고 사과하거...
+- Strict-Gated seed=42 label=0 pred=1 cf_pred=1 prob=0.8318 cf_prob=0.8154 gap=0.0163 cat=age terms=할머니->젊은여자 strict=False
+  orig: 진짜 작작해라 할머니들 팔아서 천년만년 그짓꺼리 해먹고 살려냐? 천벌받는다
+  cf  : 진짜 작작해라 젊은여자들 팔아서 천년만년 그짓꺼리 해먹고 살려냐? 천벌받는다
+- Strict-Gated seed=42 label=0 pred=1 cf_pred=1 prob=0.8527 cf_prob=0.852 gap=0.0007 cat=religion terms=이슬람->기독교 strict=True
+  orig: 중국이 이슬람을 모르네..너희 실수한거야..돈 날린거라고..
+  cf  : 중국이 기독교를 모르네..너희 실수한거야..돈 날린거라고..
+- Strict-Matched seed=42 label=0 pred=1 cf_pred=1 prob=0.696 cf_prob=0.6967 gap=0.0008 cat=gender terms=페미->한남 strict=True
+  orig: 아줌마, 숏컷으로 물타기 그만 하세요, 남자 운동선수,연예인들이 과거 남초 커뮤니티에서 유행하던 용어들 sns에 올렸다가 , 페미들에게 집중포화맞고 사과하거...
+  cf  : 아줌마, 숏컷으로 물타기 그만 하세요, 남자 운동선수,연예인들이 과거 남초 커뮤니티에서 유행하던 용어들 sns에 올렸다가 , 한남들에게 집중포화맞고 사과하거...
+- Strict-Matched seed=42 label=0 pred=1 cf_pred=0 prob=0.5001 cf_prob=0.4987 gap=0.0014 cat=gender terms=여성->남성 strict=True
+  orig: 미군철수하면 ~~ 청와대에 몇명이나 남을까 ~~ 우리나라 여성장관도 남는다 일까 ~~ 아니야 아니야 그것은 거짓말 ~~ 차라리 조국을 믿지.
+  cf  : 미군철수하면 ~~ 청와대에 몇명이나 남을까 ~~ 우리나라 남성장관도 남는다 일까 ~~ 아니야 아니야 그것은 거짓말 ~~ 차라리 조국을 믿지.
+- Strict-Matched seed=42 label=0 pred=1 cf_pred=1 prob=0.8381 cf_prob=0.834 gap=0.004 cat=age terms=할머니->젊은여자 strict=False
+  orig: 진짜 작작해라 할머니들 팔아서 천년만년 그짓꺼리 해먹고 살려냐? 천벌받는다
+  cf  : 진짜 작작해라 젊은여자들 팔아서 천년만년 그짓꺼리 해먹고 살려냐? 천벌받는다
+- Strict_lam=0.15 seed=42 label=0 pred=1 cf_pred=1 prob=0.7022 cf_prob=0.7081 gap=0.0058 cat=gender terms=페미->한남 strict=True
+  orig: 아줌마, 숏컷으로 물타기 그만 하세요, 남자 운동선수,연예인들이 과거 남초 커뮤니티에서 유행하던 용어들 sns에 올렸다가 , 페미들에게 집중포화맞고 사과하거...
+  cf  : 아줌마, 숏컷으로 물타기 그만 하세요, 남자 운동선수,연예인들이 과거 남초 커뮤니티에서 유행하던 용어들 sns에 올렸다가 , 한남들에게 집중포화맞고 사과하거...
+- Strict_lam=0.15 seed=42 label=0 pred=1 cf_pred=1 prob=0.8274 cf_prob=0.827 gap=0.0004 cat=age terms=할머니->젊은여자 strict=False
+  orig: 진짜 작작해라 할머니들 팔아서 천년만년 그짓꺼리 해먹고 살려냐? 천벌받는다
+  cf  : 진짜 작작해라 젊은여자들 팔아서 천년만년 그짓꺼리 해먹고 살려냐? 천벌받는다
+- Strict_lam=0.15 seed=42 label=0 pred=1 cf_pred=1 prob=0.8776 cf_prob=0.87 gap=0.0075 cat=religion terms=이슬람->기독교 strict=True
+  orig: 중국이 이슬람을 모르네..너희 실수한거야..돈 날린거라고..
+  cf  : 중국이 기독교를 모르네..너희 실수한거야..돈 날린거라고..
+- Masking Cons Reg seed=42 label=0 pred=1 cf_pred=1 prob=0.7338 cf_prob=0.7787 gap=0.0449 cat=gender terms=페미->한남 strict=True
+  orig: 아줌마, 숏컷으로 물타기 그만 하세요, 남자 운동선수,연예인들이 과거 남초 커뮤니티에서 유행하던 용어들 sns에 올렸다가 , 페미들에게 집중포화맞고 사과하거...
+  cf  : 아줌마, 숏컷으로 물타기 그만 하세요, 남자 운동선수,연예인들이 과거 남초 커뮤니티에서 유행하던 용어들 sns에 올렸다가 , 한남들에게 집중포화맞고 사과하거...
+- Masking Cons Reg seed=42 label=0 pred=1 cf_pred=1 prob=0.6399 cf_prob=0.6229 gap=0.017 cat=gender terms=여성->남성 strict=True
+  orig: 미군철수하면 ~~ 청와대에 몇명이나 남을까 ~~ 우리나라 여성장관도 남는다 일까 ~~ 아니야 아니야 그것은 거짓말 ~~ 차라리 조국을 믿지.
+  cf  : 미군철수하면 ~~ 청와대에 몇명이나 남을까 ~~ 우리나라 남성장관도 남는다 일까 ~~ 아니야 아니야 그것은 거짓말 ~~ 차라리 조국을 믿지.
+- Masking Cons Reg seed=42 label=0 pred=1 cf_pred=1 prob=0.9578 cf_prob=0.928 gap=0.0298 cat=age terms=할머니->젊은여자 strict=False
+  orig: 진짜 작작해라 할머니들 팔아서 천년만년 그짓꺼리 해먹고 살려냐? 천벌받는다
+  cf  : 진짜 작작해라 젊은여자들 팔아서 천년만년 그짓꺼리 해먹고 살려냐? 천벌받는다
+- Strict-Matched [lambda=0.12969483568075119, results_strict_lam005] seed=42 label=0 pred=1 cf_pred=1 prob=0.6332 cf_prob=0.6409 gap=0.0077 cat=gender terms=페미->한남 strict=True
+  orig: 아줌마, 숏컷으로 물타기 그만 하세요, 남자 운동선수,연예인들이 과거 남초 커뮤니티에서 유행하던 용어들 sns에 올렸다가 , 페미들에게 집중포화맞고 사과하거...
+  cf  : 아줌마, 숏컷으로 물타기 그만 하세요, 남자 운동선수,연예인들이 과거 남초 커뮤니티에서 유행하던 용어들 sns에 올렸다가 , 한남들에게 집중포화맞고 사과하거...
+- Strict-Matched [lambda=0.12969483568075119, results_strict_lam005] seed=42 label=0 pred=1 cf_pred=1 prob=0.8502 cf_prob=0.8814 gap=0.0311 cat=age terms=할머니->젊은여자 strict=False
+  orig: 진짜 작작해라 할머니들 팔아서 천년만년 그짓꺼리 해먹고 살려냐? 천벌받는다
+  cf  : 진짜 작작해라 젊은여자들 팔아서 천년만년 그짓꺼리 해먹고 살려냐? 천벌받는다
+- Strict-Matched [lambda=0.12969483568075119, results_strict_lam005] seed=42 label=0 pred=1 cf_pred=1 prob=0.7594 cf_prob=0.7548 gap=0.0045 cat=religion terms=이슬람->기독교 strict=True
+  orig: 중국이 이슬람을 모르네..너희 실수한거야..돈 날린거라고..
+  cf  : 중국이 기독교를 모르네..너희 실수한거야..돈 날린거라고..
+- Strict_lam=0.05 seed=42 label=0 pred=1 cf_pred=1 prob=0.73 cf_prob=0.7262 gap=0.0039 cat=gender terms=페미->한남 strict=True
+  orig: 아줌마, 숏컷으로 물타기 그만 하세요, 남자 운동선수,연예인들이 과거 남초 커뮤니티에서 유행하던 용어들 sns에 올렸다가 , 페미들에게 집중포화맞고 사과하거...
+  cf  : 아줌마, 숏컷으로 물타기 그만 하세요, 남자 운동선수,연예인들이 과거 남초 커뮤니티에서 유행하던 용어들 sns에 올렸다가 , 한남들에게 집중포화맞고 사과하거...
+- Strict_lam=0.05 seed=42 label=0 pred=1 cf_pred=0 prob=0.5219 cf_prob=0.4976 gap=0.0243 cat=gender terms=여자->남자 strict=False
+  orig: 병역특례..특헤겠지..여자선수는 뭘 해주나? 이것도 차별이고..,빨리 없애라..적어도 프로리그를 하는 종목이라도 제외해야 할것이다..
+  cf  : 병역특례..특헤겠지..남자선수는 뭘 해주나? 이것도 차별이고..,빨리 없애라..적어도 프로리그를 하는 종목이라도 제외해야 할것이다..
+- Strict_lam=0.05 seed=42 label=0 pred=1 cf_pred=1 prob=0.5867 cf_prob=0.5946 gap=0.0079 cat=gender terms=여성->남성 strict=True
+  orig: 미군철수하면 ~~ 청와대에 몇명이나 남을까 ~~ 우리나라 여성장관도 남는다 일까 ~~ 아니야 아니야 그것은 거짓말 ~~ 차라리 조국을 믿지.
+  cf  : 미군철수하면 ~~ 청와대에 몇명이나 남을까 ~~ 우리나라 남성장관도 남는다 일까 ~~ 아니야 아니야 그것은 거짓말 ~~ 차라리 조국을 믿지.
+- Strict-Matched [lambda=0.12969483568075119, results_strict_lam025] seed=42 label=0 pred=1 cf_pred=1 prob=0.655 cf_prob=0.6642 gap=0.0092 cat=gender terms=페미->한남 strict=True
+  orig: 아줌마, 숏컷으로 물타기 그만 하세요, 남자 운동선수,연예인들이 과거 남초 커뮤니티에서 유행하던 용어들 sns에 올렸다가 , 페미들에게 집중포화맞고 사과하거...
+  cf  : 아줌마, 숏컷으로 물타기 그만 하세요, 남자 운동선수,연예인들이 과거 남초 커뮤니티에서 유행하던 용어들 sns에 올렸다가 , 한남들에게 집중포화맞고 사과하거...
+- Strict-Matched [lambda=0.12969483568075119, results_strict_lam025] seed=42 label=0 pred=1 cf_pred=1 prob=0.5422 cf_prob=0.5416 gap=0.0006 cat=gender terms=여성->남성 strict=True
+  orig: 미군철수하면 ~~ 청와대에 몇명이나 남을까 ~~ 우리나라 여성장관도 남는다 일까 ~~ 아니야 아니야 그것은 거짓말 ~~ 차라리 조국을 믿지.
+  cf  : 미군철수하면 ~~ 청와대에 몇명이나 남을까 ~~ 우리나라 남성장관도 남는다 일까 ~~ 아니야 아니야 그것은 거짓말 ~~ 차라리 조국을 믿지.
+- Strict-Matched [lambda=0.12969483568075119, results_strict_lam025] seed=42 label=0 pred=1 cf_pred=1 prob=0.8301 cf_prob=0.7935 gap=0.0365 cat=age terms=할머니->젊은여자 strict=False
+  orig: 진짜 작작해라 할머니들 팔아서 천년만년 그짓꺼리 해먹고 살려냐? 천벌받는다
+  cf  : 진짜 작작해라 젊은여자들 팔아서 천년만년 그짓꺼리 해먹고 살려냐? 천벌받는다
+- Strict_lam=0.25 seed=42 label=0 pred=1 cf_pred=1 prob=0.7351 cf_prob=0.7384 gap=0.0033 cat=gender terms=페미->한남 strict=True
+  orig: 아줌마, 숏컷으로 물타기 그만 하세요, 남자 운동선수,연예인들이 과거 남초 커뮤니티에서 유행하던 용어들 sns에 올렸다가 , 페미들에게 집중포화맞고 사과하거...
+  cf  : 아줌마, 숏컷으로 물타기 그만 하세요, 남자 운동선수,연예인들이 과거 남초 커뮤니티에서 유행하던 용어들 sns에 올렸다가 , 한남들에게 집중포화맞고 사과하거...
+- Strict_lam=0.25 seed=42 label=0 pred=1 cf_pred=1 prob=0.8241 cf_prob=0.825 gap=0.001 cat=age terms=할머니->젊은여자 strict=False
+  orig: 진짜 작작해라 할머니들 팔아서 천년만년 그짓꺼리 해먹고 살려냐? 천벌받는다
+  cf  : 진짜 작작해라 젊은여자들 팔아서 천년만년 그짓꺼리 해먹고 살려냐? 천벌받는다
+- Strict_lam=0.25 seed=42 label=0 pred=1 cf_pred=1 prob=0.8696 cf_prob=0.8562 gap=0.0134 cat=religion terms=이슬람->기독교 strict=True
+  orig: 중국이 이슬람을 모르네..너희 실수한거야..돈 날린거라고..
+  cf  : 중국이 기독교를 모르네..너희 실수한거야..돈 날린거라고..
+
+Markdown table
+--------------
+| Method | Macro-F1 | Pair Acc | Strict Pair Acc | Flip Rate | Strict Flip | Prob Gap | Strict Prob Gap | FPR Gap | FPR minN | Train CF% | Cons Batch% |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Baseline | 0.7882±0.0026 | 0.8029±0.0102 | 0.8076±0.0128 | 0.0549±0.0112 | 0.0543±0.0123 | 0.0440±0.0049 | 0.0447±0.0034 | 0.4785±0.1983 | 3.0000±0.0000 | 0.0000±0.0000 | 0.0000±0.0000 |
+| Naive Swap | 0.7916±0.0017 | 0.8168±0.0037 | 0.8171±0.0023 | 0.0212±0.0041 | 0.0229±0.0040 | 0.0168±0.0006 | 0.0165±0.0009 | 0.4669±0.1560 | 3.0000±0.0000 | 4.4930±0.0000 | 94.8162±0.1519 |
+| Strict-Gated | 0.7907±0.0035 | 0.8220±0.0047 | 0.8248±0.0088 | 0.0234±0.0090 | 0.0219±0.0097 | 0.0198±0.0012 | 0.0190±0.0008 | 0.6481±0.1440 | 3.0000±0.0000 | 3.4643±0.0000 | 89.5415±0.1854 |
+| Strict-Matched | 0.7906±0.0041 | 0.8264±0.0031 | 0.8295±0.0110 | 0.0205±0.0037 | 0.0200±0.0084 | 0.0176±0.0009 | 0.0166±0.0006 | 0.5162±0.2876 | 3.0000±0.0000 | 3.4643±0.0000 | 89.5415±0.1854 |
+| Strict_lam=0.15 | 0.7917±0.0014 | 0.8249±0.0010 | 0.8305±0.0013 | 0.0190±0.0055 | 0.0181±0.0036 | 0.0168±0.0017 | 0.0160±0.0009 | 0.5093±0.1762 | 3.0000±0.0000 | 3.4643±0.0000 | 89.5415±0.1854 |
+| Masking Cons Reg | 0.7901±0.0020 | 0.8110±0.0100 | 0.8133±0.0110 | 0.0491±0.0081 | 0.0495±0.0067 | 0.0435±0.0045 | 0.0452±0.0040 | 0.4653±0.1571 | 3.0000±0.0000 | 4.4930±0.0000 | 94.8162±0.1519 |
+| Strict-Matched [lambda=0.12969483568075119, results_strict_lam005] | 0.7911±0.0039 | 0.8227±0.0068 | 0.8276±0.0115 | 0.0249±0.0037 | 0.0210±0.0013 | 0.0207±0.0020 | 0.0185±0.0012 | 0.7083±0.0295 | 3.0000±0.0000 | 3.4643±0.0000 | 89.5415±0.1854 |
+| Strict_lam=0.05 | 0.7917±0.0034 | 0.8293±0.0081 | 0.8352±0.0117 | 0.0271±0.0083 | 0.0219±0.0097 | 0.0231±0.0026 | 0.0221±0.0016 | 0.3111±0.1082 | 3.0000±0.0000 | 3.4643±0.0000 | 89.5415±0.1854 |
+| Strict-Matched [lambda=0.12969483568075119, results_strict_lam025] | 0.7890±0.0046 | 0.8242±0.0072 | 0.8286±0.0081 | 0.0212±0.0045 | 0.0200±0.0070 | 0.0186±0.0015 | 0.0177±0.0013 | 0.6273±0.1318 | 3.0000±0.0000 | 3.4643±0.0000 | 89.5415±0.1854 |
+| Strict_lam=0.25 | 0.7898±0.0038 | 0.8300±0.0055 | 0.8381±0.0110 | 0.0242±0.0047 | 0.0229±0.0047 | 0.0163±0.0014 | 0.0148±0.0012 | 0.6273±0.1318 | 3.0000±0.0000 | 3.4643±0.0000 | 89.5415±0.1854 |

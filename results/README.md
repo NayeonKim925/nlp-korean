@@ -49,14 +49,14 @@ teammate's JSON with a different result path.
 
 ## Required Summary Files
 
-After all JSON files are collected, generate:
+Both files are generated and committed:
 
 ```text
-results/summaries/compare_all_methods.txt
-results/tables/final_results_table.md
+results/summaries/compare_all_methods.txt   # full compare_results.py output
+results/tables/final_results_table.md       # markdown table (mean ± std)
 ```
 
-Use:
+To regenerate after updating any raw JSON, use:
 
 ```bash
 python validity_gated_exp/compare_results.py \
